@@ -1,0 +1,91 @@
+{
+  "meta": {
+    "generatedAt": "2025-05-11T09:20:31.076Z",
+    "tasksAnalyzed": 10,
+    "thresholdScore": 5,
+    "projectName": "Taskmaster",
+    "usedResearch": false
+  },
+  "complexityAnalysis": [
+    {
+      "taskId": 1,
+      "taskTitle": "Setup Project Infrastructure",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down the 'Setup Project Infrastructure' task into 3 subtasks: 1) Next.js and Tailwind CSS setup, 2) Supabase integration, and 3) Project structure and code quality setup. For each subtask, include specific steps, acceptance criteria, and estimated time.",
+      "reasoning": "This task involves standard setup procedures for a Next.js project with well-documented integrations. The complexity is moderate due to multiple technologies being integrated, but follows established patterns with good documentation."
+    },
+    {
+      "taskId": 2,
+      "taskTitle": "Implement User Authentication",
+      "complexityScore": 7,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Divide the 'Implement User Authentication' task into 4 subtasks: 1) Authentication UI components, 2) Auth context and hooks, 3) Protected routes middleware, and 4) Session management. For each subtask, include detailed implementation steps, security considerations, and test cases.",
+      "reasoning": "Authentication involves security concerns, state management across the application, and multiple user flows. The complexity is high due to security implications and the need for robust error handling and session management."
+    },
+    {
+      "taskId": 3,
+      "taskTitle": "Develop Vinnova API Integration Service",
+      "complexityScore": 8,
+      "recommendedSubtasks": 5,
+      "expansionPrompt": "Split the 'Develop Vinnova API Integration Service' into 5 subtasks: 1) API client implementation, 2) Data normalization, 3) Database schema design, 4) Sync service implementation, and 5) Cron job setup. For each subtask, include detailed technical requirements, error handling strategies, and performance considerations.",
+      "reasoning": "This task involves external API integration, data transformation, database design, and scheduled processes. The complexity is high due to potential API inconsistencies, error handling requirements, and the need for reliable synchronization mechanisms."
+    },
+    {
+      "taskId": 4,
+      "taskTitle": "Build Grant Discovery Dashboard",
+      "complexityScore": 6,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Divide the 'Build Grant Discovery Dashboard' task into 4 subtasks: 1) Dashboard layout and components, 2) Filter and search functionality, 3) Data fetching and pagination, and 4) Responsive design implementation. For each subtask, include UI/UX requirements, component specifications, and performance optimization strategies.",
+      "reasoning": "This task involves UI development with complex filtering, search functionality, and data fetching. The complexity is moderate to high due to the need for optimized search, filter combinations, and responsive design considerations."
+    },
+    {
+      "taskId": 5,
+      "taskTitle": "Implement Grant Detail Page",
+      "complexityScore": 5,
+      "recommendedSubtasks": 3,
+      "expansionPrompt": "Break down the 'Implement Grant Detail Page' task into 3 subtasks: 1) Page structure and data fetching, 2) UI component implementation, and 3) Navigation and sharing features. For each subtask, include design specifications, data requirements, and user interaction flows.",
+      "reasoning": "This task is primarily focused on UI implementation with some data fetching. The complexity is moderate as it involves creating multiple components and ensuring proper data display, but follows standard patterns for detail pages."
+    },
+    {
+      "taskId": 6,
+      "taskTitle": "Create User Onboarding Wizard",
+      "complexityScore": 7,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Split the 'Create User Onboarding Wizard' task into 4 subtasks: 1) Wizard framework and navigation, 2) Step implementation, 3) Alternative input methods, and 4) Data persistence. For each subtask, include UI mockups, state management approach, and validation requirements.",
+      "reasoning": "This task involves complex state management across multiple steps, alternative input methods including voice, and data persistence. The complexity is high due to the need for a seamless user experience across different input modalities."
+    },
+    {
+      "taskId": 7,
+      "taskTitle": "Implement AI-Powered Drafting System",
+      "complexityScore": 9,
+      "recommendedSubtasks": 6,
+      "expansionPrompt": "Divide the 'Implement AI-Powered Drafting System' into 6 subtasks: 1) OpenAI integration setup, 2) Prompt engineering system, 3) Draft generation workflow, 4) Editor interface, 5) Quality assessment system, and 6) Draft storage and versioning. For each subtask, include technical specifications, AI prompt strategies, and performance optimization approaches.",
+      "reasoning": "This task involves complex AI integration, prompt engineering, and a sophisticated editing interface. The complexity is very high due to the need for effective prompt design, context management, and handling AI-generated content quality."
+    },
+    {
+      "taskId": 8,
+      "taskTitle": "Implement Security and Error Handling",
+      "complexityScore": 8,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Break down the 'Implement Security and Error Handling' task into 4 subtasks: 1) Security measures implementation, 2) Input validation and sanitization, 3) Error handling system, and 4) Logging and retry mechanisms. For each subtask, include security best practices, implementation details, and testing strategies.",
+      "reasoning": "This task involves critical security implementations and robust error handling across the application. The complexity is high due to security implications, the need for comprehensive error handling, and the implementation of resilient retry mechanisms."
+    },
+    {
+      "taskId": 9,
+      "taskTitle": "Create Application Management System",
+      "complexityScore": 7,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Split the 'Create Application Management System' into 4 subtasks: 1) Database schema design, 2) Application dashboard implementation, 3) Application editor with auto-save, and 4) Submission and notification system. For each subtask, include data models, UI components, and state management approaches.",
+      "reasoning": "This task involves complex state management, real-time updates, and multi-user considerations. The complexity is high due to the need for reliable auto-save functionality, status tracking, and notification systems."
+    },
+    {
+      "taskId": 10,
+      "taskTitle": "Implement Analytics and Final Polishing",
+      "complexityScore": 6,
+      "recommendedSubtasks": 4,
+      "expansionPrompt": "Divide the 'Implement Analytics and Final Polishing' task into 4 subtasks: 1) Analytics implementation, 2) Performance optimization, 3) UI refinement, and 4) Accessibility improvements. For each subtask, include specific metrics to track, optimization techniques, and accessibility standards to meet.",
+      "reasoning": "This task involves various optimization and polishing activities across the application. The complexity is moderate to high due to the breadth of areas to address, from analytics to performance to accessibility, requiring attention to detail across the entire application."
+    }
+  ]
+}

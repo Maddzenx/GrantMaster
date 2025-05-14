@@ -1,0 +1,109 @@
+# GrantMaster MVP PRD
+
+## Project Overview
+GrantMaster is a web-based tool that helps early-stage startup founders in Sweden find relevant Vinnova grants and draft strong, tailored applications using AI. The goal is to save founders time, reduce overwhelm, and help them submit more competitive grant applications.
+
+## Target Users
+- Early-stage startup founders in Sweden
+- Non-technical users who need a clear, guided experience
+- Busy professionals who want to save time on grant applications
+
+## MVP Features
+
+### 1. Grant Discovery Dashboard
+- Display available grants from Vinnova
+- Include filters (sector, stage, deadline)
+- Search functionality with keywords
+- Each grant card shows:
+  - Title
+  - Description snippet
+  - Deadline
+  - "View" button
+
+### 2. Grant Detail Page
+- Full grant information display:
+  - Title
+  - Summary
+  - Criteria
+  - Deadlines
+  - Required documents
+  - Contact information
+- "Start Application" button
+
+### 3. User Authentication
+- Email + password authentication using Supabase
+- Save and revisit active applications
+- Secure session management
+
+### 4. User Onboarding Wizard
+- Core information collection:
+  - Company name
+  - Problem solved
+  - Solution overview
+  - Team background
+  - Target market
+- Input storage for reuse
+- Multiple input methods:
+  - Forms
+  - Chat-style UI
+  - Voice recording (with transcription)
+
+### 5. AI-Powered Drafting
+- Initial focus on "Problem & Solution" section
+- Process:
+  1. Use onboarding inputs + grant criteria
+  2. Ask clarification questions if needed
+  3. Generate draft
+  4. User approval/editing
+  5. Save to database
+
+## Technical Requirements
+
+### Vinnova GDP API Integration
+- Use GDP OpenAPI (https://api.vinnova.se/gdp/v1/)
+- Endpoints:
+  - /calls (Utlysningar)
+  - /applications (Ansökningar)
+  - /activities (Finansierade projekt)
+  - /metadata (API status/version)
+- Daily cron job for data sync:
+  - Fetch new/updated grants
+  - Parse and normalize data
+  - Store in Supabase
+- Fallback to older APIs if needed
+
+### Security Requirements
+- HTTPS implementation
+- Secure data storage
+- Supabase Auth with password hashing
+- Input sanitization
+- Error handling
+- Logging system
+- Retry logic for external calls
+
+### Architecture
+- Frontend: Next.js + Tailwind
+- Backend: Node.js services
+- Database: Supabase
+- AI: OpenAI integration
+- Modular design with clear separation of concerns
+
+### AI Implementation
+- GPT-4 integration
+- Structured prompt engineering
+- Follow-up question generation
+- Confidence scoring
+- Future fine-tuning support
+
+## Development Priorities
+1. Core infrastructure and authentication
+2. Grant data integration and display
+3. User onboarding flow
+4. AI drafting functionality
+5. Polish and optimization
+
+## Success Metrics
+- User engagement with grant discovery
+- Application completion rate
+- AI draft quality and user satisfaction
+- Time saved per application 
