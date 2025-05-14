@@ -1,0 +1,363 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Setup Project Infrastructure",
+      "description": "Initialize the Next.js project with Tailwind CSS, configure Supabase integration, and set up the development environment.",
+      "details": "1. Create a new Next.js project using `npx create-next-app@latest grantmaster --typescript`\n2. Install and configure Tailwind CSS following the official documentation\n3. Set up Supabase client integration:\n   - Install packages: `npm install @supabase/supabase-js`\n   - Create environment variables for Supabase URL and anon key\n   - Create a utils/supabase.ts file with client initialization\n4. Configure project structure:\n   - pages/ - for Next.js routes\n   - components/ - for reusable UI components\n   - lib/ - for utility functions\n   - services/ - for API integrations\n   - styles/ - for global styles\n5. Set up ESLint and Prettier for code quality\n6. Configure Git repository with appropriate .gitignore",
+      "testStrategy": "1. Verify Next.js application builds and runs without errors\n2. Confirm Tailwind CSS is properly configured by testing a sample component\n3. Test Supabase connection by making a simple query\n4. Ensure all development scripts work as expected (dev, build, start, lint)",
+      "priority": "high",
+      "dependencies": [],
+      "status": "done",
+      "subtasks": []
+    },
+    {
+      "id": 2,
+      "title": "Implement User Authentication",
+      "description": "Create a secure authentication system using Supabase Auth with email and password login, registration, and session management.",
+      "details": "1. Create authentication components:\n   - SignUp.tsx: Registration form with email, password, and confirmation\n   - SignIn.tsx: Login form with email and password\n   - ResetPassword.tsx: Password reset functionality\n   - AuthLayout.tsx: Wrapper for auth pages\n2. Implement Supabase Auth hooks and context:\n   - Create AuthContext.tsx to manage auth state\n   - Implement useAuth() hook for components to access auth state\n   - Add signUp, signIn, signOut, and resetPassword functions\n3. Create protected routes using Next.js middleware:\n   - Create middleware.ts to check auth status on protected routes\n   - Redirect unauthenticated users to login\n4. Add session persistence:\n   - Handle token refresh\n   - Store session in localStorage\n   - Implement auto-logout on session expiration\n5. Create user profile table in Supabase to store additional user data",
+      "testStrategy": "1. Test user registration with valid and invalid inputs\n2. Test login functionality with correct and incorrect credentials\n3. Verify password reset flow works end-to-end\n4. Confirm protected routes redirect unauthenticated users\n5. Test session persistence across page refreshes\n6. Verify logout functionality clears session data",
+      "priority": "high",
+      "dependencies": [
+        1
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 3,
+      "title": "Develop Vinnova API Integration Service",
+      "description": "Create a service to fetch, parse, and store grant data from the Vinnova GDP API, including a daily synchronization mechanism.",
+      "details": "1. Create a VinnovaService class in services/vinnova.ts:\n   - Implement methods for each GDP API endpoint (/calls, /applications, /activities, /metadata)\n   - Add proper error handling and retry logic\n   - Include response type definitions based on API documentation\n2. Create data normalization functions:\n   - Parse API responses into consistent internal data structures\n   - Handle edge cases and missing data\n3. Implement Supabase database schema:\n   - Create 'grants' table with appropriate columns (title, description, deadline, criteria, etc.)\n   - Add indexes for efficient querying\n4. Create a sync service:\n   - Implement incremental sync logic to fetch only new/updated grants\n   - Add data comparison to detect changes\n   - Include logging for sync operations\n5. Set up a daily cron job using Vercel Cron or similar service:\n   - Configure API route at pages/api/cron/sync-grants.ts\n   - Implement authentication for cron endpoint\n   - Add detailed logging for monitoring\n6. Implement fallback logic to older APIs if GDP API fails",
+      "testStrategy": "1. Create mock responses for Vinnova API endpoints for testing\n2. Test API integration with actual Vinnova endpoints\n3. Verify data normalization correctly handles various response formats\n4. Test incremental sync logic with sample data\n5. Verify cron job authentication and execution\n6. Test error handling and fallback mechanisms\n7. Measure sync performance with large datasets",
+      "priority": "high",
+      "dependencies": [
+        1
+      ],
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "API Client Implementation",
+          "description": "Develop a robust client for interacting with the Vinnova API, handling authentication, request formatting, and response parsing.",
+          "dependencies": [],
+          "details": "Technical requirements: Implement RESTful client using appropriate HTTP library; Handle OAuth2 authentication flow; Implement retry logic with exponential backoff; Create comprehensive logging for all API interactions. Error handling: Implement proper exception handling for network failures; Handle API rate limiting with appropriate backoff; Create custom error types for different API response codes. Performance considerations: Use connection pooling; Implement request caching where appropriate; Consider asynchronous requests for non-blocking operations.",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "Data Normalization",
+          "description": "Create data transformation layer to convert Vinnova API responses into standardized internal data models.",
+          "dependencies": [
+            1
+          ],
+          "details": "Technical requirements: Design mapper classes for each entity type; Implement validation for incoming data; Handle data type conversions and formatting; Support versioning for API schema changes. Error handling: Implement graceful handling of malformed data; Log data validation failures with detailed context; Create fallback strategies for partial data. Performance considerations: Optimize transformation algorithms for large datasets; Consider streaming processing for large responses; Implement benchmarking to identify bottlenecks.",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "Database Schema Design",
+          "description": "Design and implement database schema to store normalized Vinnova data with appropriate relationships and indexes.",
+          "dependencies": [
+            2
+          ],
+          "details": "Technical requirements: Create entity-relationship diagram; Design tables with proper normalization; Implement appropriate indexes for query optimization; Set up foreign key constraints for data integrity. Error handling: Design schema to handle incomplete data; Implement database transaction management; Create data migration strategy for schema updates. Performance considerations: Analyze query patterns for index optimization; Consider partitioning for large tables; Implement appropriate caching strategies.",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "Sync Service Implementation",
+          "description": "Develop service to orchestrate data synchronization between Vinnova API and local database, handling incremental updates and conflict resolution.",
+          "dependencies": [
+            1,
+            2,
+            3
+          ],
+          "details": "Technical requirements: Implement idempotent sync operations; Design for incremental data updates; Create conflict resolution strategies; Implement comprehensive logging and monitoring. Error handling: Develop recovery mechanisms for failed syncs; Implement transaction rollback capabilities; Create alerting for critical failures. Performance considerations: Optimize for minimal API calls; Implement parallel processing where appropriate; Design for handling large data volumes efficiently.",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "title": "Cron Job Setup",
+          "description": "Configure scheduled execution of the sync service with appropriate monitoring, logging, and failure notification.",
+          "dependencies": [
+            4
+          ],
+          "details": "Technical requirements: Set up configurable schedule for different sync operations; Implement locking mechanism to prevent overlapping jobs; Create comprehensive logging for job execution; Implement health check endpoints. Error handling: Design retry strategy for failed jobs; Implement notification system for persistent failures; Create manual override capabilities. Performance considerations: Schedule jobs during off-peak hours; Implement resource throttling to prevent system overload; Design for graceful shutdown and restart.",
+          "status": "pending"
+        },
+        {
+          "id": 6,
+          "title": "API Client Implementation",
+          "description": "Develop a robust client for interacting with the Vinnova API",
+          "dependencies": [],
+          "details": "Technical requirements: Implement RESTful client using Axios/Fetch, handle authentication with API keys, implement rate limiting compliance, support pagination for large datasets. Error handling: Implement retry logic with exponential backoff, log detailed API errors, create custom error classes for different failure types. Performance: Cache API responses where appropriate, implement connection pooling, monitor and log response times.",
+          "status": "pending"
+        },
+        {
+          "id": 7,
+          "title": "Data Normalization",
+          "description": "Create data transformation layer to normalize API responses into application data model",
+          "dependencies": [
+            6
+          ],
+          "details": "Technical requirements: Design transformation functions for each entity type, handle inconsistent data formats, implement data validation using JSON schema or similar. Error handling: Create fallback values for missing fields, log transformation errors with source data, implement circuit breaker for critical failures. Performance: Optimize transformation algorithms for large datasets, consider streaming for large payloads, implement batch processing capabilities.",
+          "status": "pending"
+        },
+        {
+          "id": 8,
+          "title": "Database Schema Design",
+          "description": "Design and implement database schema to store normalized Vinnova data",
+          "dependencies": [
+            7
+          ],
+          "details": "Technical requirements: Create entity relationship diagrams, implement migrations, design indexes for query optimization, include audit fields for tracking data provenance. Error handling: Implement database transaction management, create data integrity constraints, design rollback strategies. Performance: Analyze query patterns for optimization, implement appropriate indexing strategy, consider partitioning for time-series data if applicable.",
+          "status": "pending"
+        },
+        {
+          "id": 9,
+          "title": "Sync Service Implementation",
+          "description": "Develop service to orchestrate data synchronization between Vinnova API and local database",
+          "dependencies": [
+            6,
+            7,
+            8
+          ],
+          "details": "Technical requirements: Implement incremental sync logic using timestamps/etags, design conflict resolution strategies, create logging for sync operations, implement idempotent operations. Error handling: Design partial success handling, implement data reconciliation for failed syncs, create alerting for critical failures. Performance: Implement parallel processing where possible, optimize for memory usage during large syncs, implement progress tracking.",
+          "status": "pending"
+        },
+        {
+          "id": 10,
+          "title": "Cron Job Setup",
+          "description": "Configure scheduled execution of the sync service",
+          "dependencies": [
+            9
+          ],
+          "details": "Technical requirements: Implement configurable schedule using cron syntax, design locking mechanism to prevent overlapping jobs, implement environment-specific configurations. Error handling: Create comprehensive logging for job execution, implement notification system for failures, design retry policies. Performance: Configure resource limits for the job, implement timeout handling, create performance metrics collection.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Build Grant Discovery Dashboard",
+      "description": "Create the main dashboard interface displaying available grants with filtering, search, and sorting capabilities.",
+      "details": "1. Create dashboard layout components:\n   - DashboardLayout.tsx: Main layout with navigation\n   - GrantList.tsx: Display grants in card format\n   - GrantCard.tsx: Individual grant display component\n   - FilterPanel.tsx: Filter controls component\n2. Implement filter functionality:\n   - Create filter state using React hooks\n   - Add sector filter (dropdown)\n   - Add stage filter (checkbox group)\n   - Add deadline filter (date range picker)\n   - Implement filter logic in useGrants hook\n3. Add search functionality:\n   - Create SearchBar component with debounced input\n   - Implement keyword search against grant titles and descriptions\n   - Add search highlighting\n4. Implement grant data fetching:\n   - Create custom hook useGrants() to fetch grants from Supabase\n   - Add pagination support (10 grants per page)\n   - Implement sorting options (deadline, relevance)\n5. Add responsive design for mobile and desktop views",
+      "testStrategy": "1. Test filter combinations to ensure correct results\n2. Verify search functionality with various keywords\n3. Test pagination with different result set sizes\n4. Ensure responsive design works on various screen sizes\n5. Verify grant cards display all required information\n6. Test performance with large numbers of grants\n7. Verify 'View' button navigation works correctly",
+      "priority": "medium",
+      "dependencies": [
+        2,
+        3
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 5,
+      "title": "Implement Grant Detail Page",
+      "description": "Create a detailed view page for individual grants showing complete information and allowing users to start an application.",
+      "details": "1. Create GrantDetail page at pages/grants/[id].tsx:\n   - Implement getServerSideProps to fetch grant data by ID\n   - Create detailed layout with all grant information sections\n2. Design and implement UI components:\n   - GrantHeader: Title, deadline, and key information\n   - GrantSummary: Expandable summary section\n   - GrantCriteria: List of eligibility criteria\n   - RequiredDocuments: Documents needed for application\n   - ContactInformation: Vinnova contact details\n3. Add 'Start Application' button:\n   - Connect to application creation flow\n   - Handle already-started applications\n4. Implement breadcrumb navigation\n5. Add sharing functionality (copy link, email)\n6. Create 'Back to Dashboard' navigation\n7. Add responsive design for all screen sizes",
+      "testStrategy": "1. Test page rendering with various grant data structures\n2. Verify all grant information is displayed correctly\n3. Test 'Start Application' button functionality\n4. Ensure breadcrumb navigation works correctly\n5. Test sharing functionality\n6. Verify responsive design on different devices\n7. Test navigation between detail page and dashboard",
+      "priority": "medium",
+      "dependencies": [
+        4
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 6,
+      "title": "Create User Onboarding Wizard",
+      "description": "Develop a multi-step onboarding wizard to collect core company information with multiple input methods.",
+      "details": "1. Create wizard framework:\n   - Implement multi-step form using React state management\n   - Add progress indicator and navigation controls\n   - Create StepContainer component for consistent styling\n2. Implement onboarding steps:\n   - CompanyInfoStep: Company name, founding date, size\n   - ProblemStep: Problem description input\n   - SolutionStep: Solution overview input\n   - TeamStep: Team background and experience\n   - MarketStep: Target market information\n3. Create multiple input methods:\n   - StandardForm: Traditional form inputs\n   - ChatInterface: Conversational UI for information collection\n   - VoiceInput: Record audio and transcribe using Web Speech API\n4. Implement data storage:\n   - Create 'user_profiles' table in Supabase\n   - Save inputs after each step\n   - Allow resuming incomplete onboarding\n5. Add input validation and error handling\n6. Implement completion state and redirect to dashboard",
+      "testStrategy": "1. Test wizard navigation (next, previous, jump to step)\n2. Verify data persistence between steps\n3. Test each input method (form, chat, voice)\n4. Validate form inputs with various data scenarios\n5. Test onboarding resumption after leaving the flow\n6. Verify completion state and redirect\n7. Test responsive design on various devices",
+      "priority": "medium",
+      "dependencies": [
+        2
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 7,
+      "title": "Implement AI-Powered Drafting System",
+      "description": "Create the AI drafting functionality that generates grant application content based on user inputs and grant criteria.",
+      "details": "1. Set up OpenAI integration:\n   - Install openai package: `npm install openai`\n   - Create OpenAIService class with API key configuration\n   - Implement rate limiting and error handling\n2. Design prompt engineering system:\n   - Create PromptBuilder class to construct effective prompts\n   - Combine user profile data with grant criteria\n   - Implement context management for follow-up questions\n3. Create AI drafting workflow:\n   - Implement initial draft generation\n   - Add clarification question generation when information is insufficient\n   - Create draft revision system based on user feedback\n4. Build draft editor interface:\n   - Create DraftEditor component with rich text editing\n   - Add inline suggestions and improvements\n   - Implement version history\n5. Implement confidence scoring:\n   - Add quality assessment for generated content\n   - Flag sections that may need human review\n6. Create database schema for drafts:\n   - Store drafts with version history\n   - Link drafts to specific grants and users",
+      "testStrategy": "1. Test prompt generation with various input combinations\n2. Verify AI responses meet quality standards\n3. Test clarification question generation\n4. Validate draft editor functionality\n5. Test version history and revisions\n6. Verify confidence scoring accuracy\n7. Measure response times and optimize if needed\n8. Test error handling with API failures",
+      "priority": "high",
+      "dependencies": [
+        3,
+        6
+      ],
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "OpenAI Integration Setup",
+          "description": "Establish secure API connections with OpenAI services and implement authentication, rate limiting, and error handling mechanisms.",
+          "dependencies": [],
+          "details": "Technical Specifications: Implement OAuth 2.0 authentication, configure API key management with environment variables, set up retry logic with exponential backoff, implement request queuing system to handle rate limits (40 RPM), and create a monitoring dashboard for API usage. AI Prompt Strategy: N/A for this phase. Performance Optimization: Implement connection pooling, response caching for identical requests, and asynchronous API calls to minimize latency.",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "Prompt Engineering System",
+          "description": "Design and implement a flexible prompt template system with parameter injection, context management, and prompt versioning capabilities.",
+          "dependencies": [
+            1
+          ],
+          "details": "Technical Specifications: Create a prompt template DSL, implement context window management to optimize token usage, develop prompt versioning system with A/B testing capabilities. AI Prompt Strategy: Implement few-shot learning templates, chain-of-thought reasoning structures, and system role definitions. Performance Optimization: Implement prompt compression techniques, dynamic temperature adjustment based on task complexity, and parallel prompt variation testing.",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "Draft Generation Workflow",
+          "description": "Build the end-to-end process for generating drafts, including input processing, context preparation, AI request handling, and output formatting.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Technical Specifications: Implement streaming response handling, develop content chunking for large documents, create draft assembly pipeline with templating engine. AI Prompt Strategy: Design multi-stage generation with outline-then-expand approach, implement specialized prompts for different content types. Performance Optimization: Implement parallel generation of document sections, progressive loading UI, and background processing for large drafts.",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "Editor Interface",
+          "description": "Develop a rich text editor with AI-assisted editing features, real-time collaboration, and seamless integration with the draft generation system.",
+          "dependencies": [
+            3
+          ],
+          "details": "Technical Specifications: Implement WYSIWYG editor with markdown support, real-time collaboration using operational transforms, AI suggestion inline display. AI Prompt Strategy: Create context-aware editing suggestions, implement targeted regeneration prompts for specific sections. Performance Optimization: Implement virtual DOM for large documents, lazy-loading of document sections, and optimistic UI updates.",
+          "status": "pending"
+        },
+        {
+          "id": 5,
+          "title": "Quality Assessment System",
+          "description": "Create automated evaluation mechanisms for AI-generated drafts, including readability scoring, factual accuracy checking, and style consistency analysis.",
+          "dependencies": [
+            3
+          ],
+          "details": "Technical Specifications: Implement readability metrics (Flesch-Kincaid, SMOG), develop fact-checking system with knowledge base integration, create style consistency analyzer. AI Prompt Strategy: Design self-evaluation prompts, implement comparative quality assessment between versions. Performance Optimization: Background quality checks, incremental assessment for large documents, and caching of quality metrics.",
+          "status": "pending"
+        },
+        {
+          "id": 6,
+          "title": "Draft Storage and Versioning",
+          "description": "Implement a robust storage system for drafts with version control, diff visualization, and metadata management capabilities.",
+          "dependencies": [
+            3,
+            4,
+            5
+          ],
+          "details": "Technical Specifications: Implement Git-like versioning system, develop semantic diff visualization, create metadata schema with generation parameters. AI Prompt Strategy: Design prompts for generating commit messages and version summaries. Performance Optimization: Implement delta storage for versions, lazy-loading of version history, and compressed storage for draft archives.",
+          "status": "pending"
+        },
+        {
+          "id": 7,
+          "title": "OpenAI Integration Setup",
+          "description": "Establish secure API connections with OpenAI services and implement authentication mechanisms for the drafting system.",
+          "dependencies": [],
+          "details": "Technical specifications: Implement OAuth 2.0 authentication, set up API key management with proper encryption, configure rate limiting and error handling, establish connection pooling for performance optimization. Create a service layer that abstracts OpenAI API calls with retry logic and fallback mechanisms. Performance optimization: Implement request caching, connection pooling, and asynchronous API calls to minimize latency.",
+          "status": "pending"
+        },
+        {
+          "id": 8,
+          "title": "Prompt Engineering System",
+          "description": "Design and implement a flexible prompt template system with variables, context management, and optimization capabilities.",
+          "dependencies": [
+            7
+          ],
+          "details": "Technical specifications: Create a prompt template engine with variable substitution, implement context window management to optimize token usage, develop prompt versioning system. AI prompt strategies: Implement few-shot learning templates, chain-of-thought prompting structures, and system message optimization. Performance optimization: Develop prompt compression techniques, implement prompt caching for similar requests, and create analytics for prompt effectiveness measurement.",
+          "status": "pending"
+        },
+        {
+          "id": 9,
+          "title": "Draft Generation Workflow",
+          "description": "Build the core pipeline for transforming user inputs into complete drafts through the AI system with appropriate controls and parameters.",
+          "dependencies": [
+            7,
+            8
+          ],
+          "details": "Technical specifications: Implement a state machine for multi-stage draft generation, create parameter controls for temperature/creativity settings, develop streaming response handling. AI prompt strategies: Design sequential prompting for complex drafts, implement context preservation between generation steps. Performance optimization: Implement parallel processing for draft sections, optimize token usage through smart chunking, and implement progressive loading for large drafts.",
+          "status": "pending"
+        },
+        {
+          "id": 10,
+          "title": "Editor Interface",
+          "description": "Develop a user-friendly editor with AI-assisted features, real-time collaboration, and draft manipulation tools.",
+          "dependencies": [
+            9
+          ],
+          "details": "Technical specifications: Build a rich text editor with markdown support, implement real-time collaboration using operational transforms, create AI suggestion sidebars. AI prompt strategies: Design inline completion prompts, implement contextual suggestions based on surrounding text. Performance optimization: Use virtualization for large documents, implement differential updates, and optimize rendering for complex documents with lazy loading of components.",
+          "status": "pending"
+        },
+        {
+          "id": 11,
+          "title": "Quality Assessment System",
+          "description": "Create automated evaluation mechanisms to assess draft quality, coherence, and alignment with user requirements.",
+          "dependencies": [
+            9
+          ],
+          "details": "Technical specifications: Implement NLP-based quality metrics, create feedback collection mechanisms, develop a scoring system for drafts. AI prompt strategies: Design evaluation prompts that assess factual accuracy, coherence, and style consistency. Performance optimization: Implement background quality checks, use incremental assessment for large documents, and create a caching system for common quality issues.",
+          "status": "pending"
+        },
+        {
+          "id": 12,
+          "title": "Draft Storage and Versioning",
+          "description": "Implement a robust system for storing, versioning, and retrieving drafts with metadata and change tracking.",
+          "dependencies": [
+            9,
+            10
+          ],
+          "details": "Technical specifications: Design a database schema for draft storage with versioning support, implement Git-like version control for drafts, create metadata indexing for search. AI prompt strategies: Develop summarization prompts for version differences, implement context retrieval for historical versions. Performance optimization: Use incremental storage for versions, implement compression for draft storage, and create efficient indexing for quick retrieval of specific versions.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Implement Security and Error Handling",
+      "description": "Enhance application security, implement comprehensive error handling, and add logging throughout the application.",
+      "details": "1. Implement security measures:\n   - Configure HTTPS for all environments\n   - Add Content Security Policy headers\n   - Implement CSRF protection\n   - Add rate limiting for authentication endpoints\n2. Create input sanitization:\n   - Sanitize all user inputs before processing\n   - Implement validation middleware\n   - Add XSS protection\n3. Develop error handling system:\n   - Create ErrorBoundary component for React errors\n   - Implement custom error types for different scenarios\n   - Add user-friendly error messages\n   - Create fallback UI for error states\n4. Set up logging system:\n   - Implement structured logging with context\n   - Add request/response logging\n   - Create error logging with stack traces\n   - Configure log rotation and storage\n5. Implement retry logic:\n   - Add exponential backoff for external API calls\n   - Create circuit breaker pattern for failing services\n   - Implement graceful degradation",
+      "testStrategy": "1. Perform security testing (XSS, CSRF, injection attacks)\n2. Test input validation with malicious inputs\n3. Verify error handling with simulated failures\n4. Test logging system captures appropriate information\n5. Verify retry logic works with simulated API failures\n6. Test rate limiting functionality\n7. Perform load testing to identify security issues under stress",
+      "priority": "high",
+      "dependencies": [
+        2,
+        3
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 9,
+      "title": "Create Application Management System",
+      "description": "Develop functionality for users to manage their grant applications, including saving, editing, and tracking status.",
+      "details": "1. Create database schema for applications:\n   - applications table with status, created_at, updated_at\n   - application_sections table for different parts of the application\n   - application_history for tracking changes\n2. Implement application dashboard:\n   - Create MyApplications component showing all user applications\n   - Add status indicators (draft, in progress, submitted)\n   - Implement sorting and filtering\n3. Build application editor:\n   - Create ApplicationEditor component for editing applications\n   - Implement auto-save functionality\n   - Add section navigation\n   - Create progress tracker\n4. Add collaboration features:\n   - Implement simple sharing functionality\n   - Add commenting on specific sections\n5. Create application submission flow:\n   - Add validation before submission\n   - Implement confirmation process\n   - Create success/failure handling\n6. Add notification system:\n   - Deadline reminders\n   - Application status updates",
+      "testStrategy": "1. Test application creation and storage\n2. Verify auto-save functionality works reliably\n3. Test application status changes\n4. Validate submission flow with various application states\n5. Test filtering and sorting in the applications dashboard\n6. Verify notifications are triggered correctly\n7. Test collaboration features with multiple users",
+      "priority": "medium",
+      "dependencies": [
+        5,
+        7
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 10,
+      "title": "Implement Analytics and Final Polishing",
+      "description": "Add analytics tracking, optimize performance, and polish the user interface for production readiness.",
+      "details": "1. Implement analytics:\n   - Add Google Analytics or similar service\n   - Create custom events for key user actions\n   - Set up conversion tracking for completed applications\n   - Implement success metrics tracking\n2. Optimize performance:\n   - Add code splitting and lazy loading\n   - Implement image optimization\n   - Add caching strategies\n   - Optimize database queries\n3. Polish user interface:\n   - Ensure consistent styling throughout the application\n   - Add loading states and animations\n   - Implement toast notifications for user feedback\n   - Create empty states for lists\n4. Add final user experience improvements:\n   - Implement keyboard shortcuts\n   - Add helpful tooltips\n   - Create onboarding tour for new users\n5. Perform cross-browser testing and fixes\n6. Implement accessibility improvements:\n   - Add ARIA attributes\n   - Ensure keyboard navigation\n   - Test with screen readers",
+      "testStrategy": "1. Verify analytics events are firing correctly\n2. Measure and compare performance metrics before and after optimization\n3. Test application on various browsers and devices\n4. Perform accessibility audit using automated tools\n5. Conduct usability testing with representative users\n6. Verify all success metrics are being tracked correctly\n7. Test application under various network conditions",
+      "priority": "low",
+      "dependencies": [
+        4,
+        5,
+        6,
+        7,
+        9
+      ],
+      "status": "pending",
+      "subtasks": []
+    }
+  ]
+}

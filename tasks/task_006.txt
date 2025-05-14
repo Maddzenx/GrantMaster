@@ -1,0 +1,36 @@
+# Task ID: 6
+# Title: Create User Onboarding Wizard
+# Status: pending
+# Dependencies: 2
+# Priority: medium
+# Description: Develop a multi-step onboarding wizard to collect core company information with multiple input methods.
+# Details:
+1. Create wizard framework:
+   - Implement multi-step form using React state management
+   - Add progress indicator and navigation controls
+   - Create StepContainer component for consistent styling
+2. Implement onboarding steps:
+   - CompanyInfoStep: Company name, founding date, size
+   - ProblemStep: Problem description input
+   - SolutionStep: Solution overview input
+   - TeamStep: Team background and experience
+   - MarketStep: Target market information
+3. Create multiple input methods:
+   - StandardForm: Traditional form inputs
+   - ChatInterface: Conversational UI for information collection
+   - VoiceInput: Record audio and transcribe using Web Speech API
+4. Implement data storage:
+   - Create 'user_profiles' table in Supabase
+   - Save inputs after each step
+   - Allow resuming incomplete onboarding
+5. Add input validation and error handling
+6. Implement completion state and redirect to dashboard
+
+# Test Strategy:
+1. Test wizard navigation (next, previous, jump to step)
+2. Verify data persistence between steps
+3. Test each input method (form, chat, voice)
+4. Validate form inputs with various data scenarios
+5. Test onboarding resumption after leaving the flow
+6. Verify completion state and redirect
+7. Test responsive design on various devices

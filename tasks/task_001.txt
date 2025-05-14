@@ -1,0 +1,27 @@
+# Task ID: 1
+# Title: Setup Project Infrastructure
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Initialize the Next.js project with Tailwind CSS, configure Supabase integration, and set up the development environment.
+# Details:
+1. Create a new Next.js project using `npx create-next-app@latest grantmaster --typescript`
+2. Install and configure Tailwind CSS following the official documentation
+3. Set up Supabase client integration:
+   - Install packages: `npm install @supabase/supabase-js`
+   - Create environment variables for Supabase URL and anon key
+   - Create a utils/supabase.ts file with client initialization
+4. Configure project structure:
+   - pages/ - for Next.js routes
+   - components/ - for reusable UI components
+   - lib/ - for utility functions
+   - services/ - for API integrations
+   - styles/ - for global styles
+5. Set up ESLint and Prettier for code quality
+6. Configure Git repository with appropriate .gitignore
+
+# Test Strategy:
+1. Verify Next.js application builds and runs without errors
+2. Confirm Tailwind CSS is properly configured by testing a sample component
+3. Test Supabase connection by making a simple query
+4. Ensure all development scripts work as expected (dev, build, start, lint)

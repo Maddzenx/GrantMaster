@@ -1,0 +1,32 @@
+# Task ID: 5
+# Title: Implement Grant Detail Page
+# Status: pending
+# Dependencies: 4
+# Priority: medium
+# Description: Create a detailed view page for individual grants showing complete information and allowing users to start an application.
+# Details:
+1. Create GrantDetail page at pages/grants/[id].tsx:
+   - Implement getServerSideProps to fetch grant data by ID
+   - Create detailed layout with all grant information sections
+2. Design and implement UI components:
+   - GrantHeader: Title, deadline, and key information
+   - GrantSummary: Expandable summary section
+   - GrantCriteria: List of eligibility criteria
+   - RequiredDocuments: Documents needed for application
+   - ContactInformation: Vinnova contact details
+3. Add 'Start Application' button:
+   - Connect to application creation flow
+   - Handle already-started applications
+4. Implement breadcrumb navigation
+5. Add sharing functionality (copy link, email)
+6. Create 'Back to Dashboard' navigation
+7. Add responsive design for all screen sizes
+
+# Test Strategy:
+1. Test page rendering with various grant data structures
+2. Verify all grant information is displayed correctly
+3. Test 'Start Application' button functionality
+4. Ensure breadcrumb navigation works correctly
+5. Test sharing functionality
+6. Verify responsive design on different devices
+7. Test navigation between detail page and dashboard

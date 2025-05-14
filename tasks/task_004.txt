@@ -1,0 +1,36 @@
+# Task ID: 4
+# Title: Build Grant Discovery Dashboard
+# Status: pending
+# Dependencies: 2, 3
+# Priority: medium
+# Description: Create the main dashboard interface displaying available grants with filtering, search, and sorting capabilities.
+# Details:
+1. Create dashboard layout components:
+   - DashboardLayout.tsx: Main layout with navigation
+   - GrantList.tsx: Display grants in card format
+   - GrantCard.tsx: Individual grant display component
+   - FilterPanel.tsx: Filter controls component
+2. Implement filter functionality:
+   - Create filter state using React hooks
+   - Add sector filter (dropdown)
+   - Add stage filter (checkbox group)
+   - Add deadline filter (date range picker)
+   - Implement filter logic in useGrants hook
+3. Add search functionality:
+   - Create SearchBar component with debounced input
+   - Implement keyword search against grant titles and descriptions
+   - Add search highlighting
+4. Implement grant data fetching:
+   - Create custom hook useGrants() to fetch grants from Supabase
+   - Add pagination support (10 grants per page)
+   - Implement sorting options (deadline, relevance)
+5. Add responsive design for mobile and desktop views
+
+# Test Strategy:
+1. Test filter combinations to ensure correct results
+2. Verify search functionality with various keywords
+3. Test pagination with different result set sizes
+4. Ensure responsive design works on various screen sizes
+5. Verify grant cards display all required information
+6. Test performance with large numbers of grants
+7. Verify 'View' button navigation works correctly
