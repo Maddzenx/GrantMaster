@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useAuth } from '@/components/auth/useAuth'; // Adjust path if needed
+import { useAuth } from '../lib/auth/AuthContext';
 
 export default function AuthStatus() {
   const { user, signIn, signOut, loading } = useAuth();
