@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
   }
 
   const { error } = await supabaseAdmin.auth.admin.signOutUserSessions(userId);
-
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
