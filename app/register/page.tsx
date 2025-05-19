@@ -2,8 +2,6 @@
 
 import React from 'react';
 import RegisterForm from '@/components/auth/RegisterForm';
-import LoginForm from '@/components/auth/LoginForm';
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 export default function RegisterPage() {
   return (
@@ -12,15 +10,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-
-export function LoginPage() {
-  return <LoginForm />;
-}
-
-export function DashboardPage() {
-  return (
-    <ProtectedRoute>
-      {/* Dashboard content here */}
-    </ProtectedRoute>
-  );
-} 
