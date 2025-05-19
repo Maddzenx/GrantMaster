@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
 
   const { error } = await supabaseAdmin.auth.admin.signOut(
     sessionToken,
-    { scope: 'global' }
+    'global'
   );
 
   if (error) {
