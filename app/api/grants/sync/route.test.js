@@ -13,51 +13,71 @@ jest.mock('@/app/lib/supabase', () => ({
 
 global.fetch = jest.fn();
 
+jest.mock('@/app/lib/vinnovaSync', () => ({
+  syncVinnovaGrants: jest.fn(),
+}));
+
+const { syncVinnovaGrants } = require('@/app/lib/vinnovaSync');
+
 describe('GET /api/grants/sync', () => {
+  const secret = 'test-secret';
+  beforeAll(() => {
+    process.env.SYNC_CRON_SECRET = secret;
+  });
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should fetch grants from Vinnova, upsert them, and return success', async () => {
-    // Mock Vinnova API response
-    const vinnovaData = [
-      { id: '1', title: 'Grant 1', description: 'Desc 1', deadline: '2024-12-31', sector: 'Tech', stage: 'Seed' },
-      { diarienummer: '2', titel: 'Grant 2', beskrivning: 'Desc 2', slutdatum: '2025-01-15', omrade: 'Health', stage: 'Growth' }
-    ];
-    fetch.mockResolvedValueOnce({
-      json: () => Promise.resolve(vinnovaData)
-    });
-    mockUpsert.mockResolvedValue({});
+  function makeReq(token) {
+    return {
+      headers: {
+        get: (name) => name === 'authorization' ? (token ? `Bearer ${token}` : undefined) : undefined,
+      },
+    };
+  }
 
-    const response = await GET();
-    expect(fetch).toHaveBeenCalled();
-    expect(mockUpsert).toHaveBeenCalledTimes(2);
-    expect(response.status).toBe(200);
-    const body = JSON.parse(await response.text());
-    expect(body.success).toBe(true);
-    expect(body.count).toBe(2);
+  it('returns 401 if no Authorization header', async () => {
+    const res = await GET(makeReq());
+    expect(res.status).toBe(401);
+    const body = JSON.parse(await res.text());
+    expect(body.success).toBe(false);
+    expect(body.error).toMatch(/Unauthorized/);
   });
 
-  it('should handle empty results gracefully', async () => {
-    fetch.mockResolvedValueOnce({ json: () => Promise.resolve([]) });
-    mockUpsert.mockResolvedValue({});
-    const response = await GET();
-    expect(mockUpsert).not.toHaveBeenCalled();
-    expect(response.status).toBe(200);
-    const body = JSON.parse(await response.text());
-    expect(body.success).toBe(true);
-    expect(body.count).toBe(0);
+  it('returns 401 if token is invalid', async () => {
+    const res = await GET(makeReq('wrong-token'));
+    expect(res.status).toBe(401);
+    const body = JSON.parse(await res.text());
+    expect(body.success).toBe(false);
+    expect(body.error).toMatch(/Unauthorized/);
   });
 
-  it('should skip grants without id', async () => {
-    const vinnovaData = [{ title: 'No ID' }];
-    fetch.mockResolvedValueOnce({ json: () => Promise.resolve(vinnovaData) });
-    mockUpsert.mockResolvedValue({});
-    const response = await GET();
-    expect(mockUpsert).not.toHaveBeenCalled();
-    expect(response.status).toBe(200);
-    const body = JSON.parse(await response.text());
+  it('returns a sync report on success', async () => {
+    const mockReport = {
+      inserted: 2,
+      updated: 1,
+      unchanged: 3,
+      failed: 0,
+      errors: [],
+      total: 6,
+      startedAt: '2025-05-19T18:00:00.000Z',
+      finishedAt: '2025-05-19T18:00:01.000Z',
+      durationMs: 1000,
+    };
+    syncVinnovaGrants.mockResolvedValue(mockReport);
+    const res = await GET(makeReq(secret));
+    expect(res.status).toBe(200);
+    const body = JSON.parse(await res.text());
     expect(body.success).toBe(true);
-    expect(body.count).toBe(1); // Still counted, but not upserted
+    expect(body.report).toEqual(mockReport);
+  });
+
+  it('returns 500 on error', async () => {
+    syncVinnovaGrants.mockRejectedValue(new Error('Sync failed'));
+    const res = await GET(makeReq(secret));
+    expect(res.status).toBe(500);
+    const body = JSON.parse(await res.text());
+    expect(body.success).toBe(false);
+    expect(body.error).toMatch(/Sync failed/);
   });
 }); 

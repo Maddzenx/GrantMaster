@@ -35,17 +35,57 @@
 7. Measure sync performance with large datasets
 
 # Subtasks:
-## 1. API Client Implementation [pending]
+## 1. API Client Implementation [in-progress]
 ### Dependencies: None
 ### Description: Develop a robust client for interacting with the Vinnova API, handling authentication, request formatting, and response parsing.
 ### Details:
 Technical requirements: Implement RESTful client using appropriate HTTP library; Handle OAuth2 authentication flow; Implement retry logic with exponential backoff; Create comprehensive logging for all API interactions. Error handling: Implement proper exception handling for network failures; Handle API rate limiting with appropriate backoff; Create custom error types for different API response codes. Performance considerations: Use connection pooling; Implement request caching where appropriate; Consider asynchronous requests for non-blocking operations.
 
-## 2. Data Normalization [pending]
+## 2. Data Normalization [in-progress]
 ### Dependencies: 3.1
 ### Description: Create data transformation layer to convert Vinnova API responses into standardized internal data models.
 ### Details:
 Technical requirements: Design mapper classes for each entity type; Implement validation for incoming data; Handle data type conversions and formatting; Support versioning for API schema changes. Error handling: Implement graceful handling of malformed data; Log data validation failures with detailed context; Create fallback strategies for partial data. Performance considerations: Optimize transformation algorithms for large datasets; Consider streaming processing for large responses; Implement benchmarking to identify bottlenecks.
+<info added on 2025-05-19T18:17:09.086Z>
+Technical requirements: Design mapper classes for each entity type; Implement validation for incoming data; Handle data type conversions and formatting; Support versioning for API schema changes. Error handling: Implement graceful handling of malformed data; Log data validation failures with detailed context; Create fallback strategies for partial data. Performance considerations: Optimize transformation algorithms for large datasets; Consider streaming processing for large responses; Implement benchmarking to identify bottlenecks.
+
+Implementation Plan (Iteration 1):
+
+1. Review Vinnova API Client Output:
+   - Examine the structure of API responses from the Vinnova API client in app/lib/vinnovaClient.js
+   - Document all entity types (grants, calls, activities, etc.) and their field structures
+   - Identify data types, required vs optional fields, and any nested structures
+
+2. Design Internal Data Models:
+   - Use Supabase types (particularly for the grants table) as the target schema
+   - Create explicit mapping definitions between Vinnova API fields and internal database schema
+   - Document type conversions needed (dates, enums, numeric values)
+   - Implement versioning strategy to handle future API schema changes
+
+3. Implement Mapper Functions:
+   - Develop separate normalization functions for each entity type (normalizeGrant, normalizeCall)
+   - Add validation logic with descriptive error messages
+   - Implement fallback/default values for missing or null fields
+   - Create utility functions for common transformations (date formatting, string normalization)
+
+4. Testing Strategy:
+   - Write comprehensive unit tests covering normal cases, edge cases, and error scenarios
+   - Create test fixtures with sample API responses
+   - Implement performance benchmarks for transformation operations
+   - Test with deliberately malformed data to verify error handling
+
+5. Optimization:
+   - Implement streaming or batch processing for large datasets
+   - Add memory usage monitoring
+   - Create performance metrics to identify bottlenecks
+   - Optimize critical transformation paths
+
+6. Documentation:
+   - Document all mapping logic and transformation rules
+   - Create examples of before/after data transformation
+   - Document error handling and fallback strategies
+   - Maintain a changelog for future schema updates
+</info added on 2025-05-19T18:17:09.086Z>
 
 ## 3. Database Schema Design [pending]
 ### Dependencies: 3.2
@@ -53,13 +93,64 @@ Technical requirements: Design mapper classes for each entity type; Implement va
 ### Details:
 Technical requirements: Create entity-relationship diagram; Design tables with proper normalization; Implement appropriate indexes for query optimization; Set up foreign key constraints for data integrity. Error handling: Design schema to handle incomplete data; Implement database transaction management; Create data migration strategy for schema updates. Performance considerations: Analyze query patterns for index optimization; Consider partitioning for large tables; Implement appropriate caching strategies.
 
-## 4. Sync Service Implementation [pending]
+## 4. Sync Service Implementation [done]
 ### Dependencies: 3.1, 3.2, 3.3
 ### Description: Develop service to orchestrate data synchronization between Vinnova API and local database, handling incremental updates and conflict resolution.
 ### Details:
 Technical requirements: Implement idempotent sync operations; Design for incremental data updates; Create conflict resolution strategies; Implement comprehensive logging and monitoring. Error handling: Develop recovery mechanisms for failed syncs; Implement transaction rollback capabilities; Create alerting for critical failures. Performance considerations: Optimize for minimal API calls; Implement parallel processing where appropriate; Design for handling large data volumes efficiently.
+<info added on 2025-05-19T18:23:22.529Z>
+Technical requirements: Implement idempotent sync operations; Design for incremental data updates; Create conflict resolution strategies; Implement comprehensive logging and monitoring. Error handling: Develop recovery mechanisms for failed syncs; Implement transaction rollback capabilities; Create alerting for critical failures. Performance considerations: Optimize for minimal API calls; Implement parallel processing where appropriate; Design for handling large data volumes efficiently.
 
-## 5. Cron Job Setup [pending]
+Implementation Plan (Iteration 1):
+
+1. Module Structure:
+   - Create sync module at `app/lib/vinnovaSync.js` or `vinnovaSync.ts`
+   - Leverage existing `fetchVinnovaGrants()` function for API interaction
+   - Design core sync function with proper error handling and logging
+
+2. Sync Logic Flow:
+   - Fetch normalized grants from Vinnova API
+   - For each grant record:
+     * Generate a unique identifier or use existing ID
+     * Compare with existing database records
+     * Perform upsert operations using Supabase client
+     * Track operation results (inserted/updated/unchanged/failed)
+   - Return comprehensive sync report
+
+3. Idempotency Implementation:
+   - Use database constraints to prevent duplicates
+   - Implement comparison logic to detect actual changes before updates
+   - Design transaction patterns to ensure atomic operations
+
+4. Logging & Monitoring:
+   - Log start/end of sync process with timestamps
+   - Record counts of processed records by category
+   - Capture detailed error information for failed operations
+   - Track performance metrics (duration, resource usage)
+
+5. Error Handling:
+   - Implement try/catch blocks around critical operations
+   - Design graceful degradation for partial failures
+   - Create error classification system for actionable alerts
+
+6. Testing Strategy:
+   - Unit tests for core sync logic
+   - Integration tests with mock API responses
+   - Edge case testing (API failures, network issues, data anomalies)
+   - Idempotency verification tests
+
+7. Performance Optimization:
+   - Implement batched database operations
+   - Consider chunking for large datasets
+   - Add configurable throttling for API rate limits
+
+8. Documentation:
+   - Document sync process workflow
+   - Note assumptions and limitations
+   - Provide usage examples and configuration options
+</info added on 2025-05-19T18:23:22.529Z>
+
+## 5. Cron Job Setup [in-progress]
 ### Dependencies: 3.4
 ### Description: Configure scheduled execution of the sync service with appropriate monitoring, logging, and failure notification.
 ### Details:

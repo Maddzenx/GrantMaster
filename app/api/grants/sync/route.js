@@ -1,25 +1,16 @@
-import { supabase } from '@/app/lib/supabase';
+import { syncVinnovaGrants } from '@/app/lib/vinnovaSync';
 
-export async function GET() {
-  const res = await fetch(process.env.VINNOVA_CALLS_ENDPOINT);
-  const data = await res.json();
-
-  // Adjust this mapping to match the actual Vinnova API response
-  const grants = (Array.isArray(data) ? data : data.results || []).map(grant => ({
-    id: grant.id || grant.diarienummer || grant.identifier,
-    title: grant.title || grant.titel || '',
-    description: grant.description || grant.beskrivning || '',
-    deadline: grant.deadline || grant.slutdatum || null,
-    sector: grant.sector || grant.omrade || '',
-    stage: grant.stage || '',
-  }));
-
-  // Upsert grants into Supabase
-  for (const grant of grants) {
-    if (grant.id) {
-      await supabase.from('grants').upsert(grant, { onConflict: ['id'] });
-    }
+export async function GET(req) {
+  // Simple token-based authentication
+  const expected = process.env.SYNC_CRON_SECRET;
+  const auth = req?.headers?.get('authorization') || '';
+  if (!expected || !auth.startsWith('Bearer ') || auth.slice(7) !== expected) {
+    return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), { status: 401 });
   }
-
-  return new Response(JSON.stringify({ success: true, count: grants.length }), { status: 200 });
+  try {
+    const report = await syncVinnovaGrants();
+    return new Response(JSON.stringify({ success: true, report }), { status: 200 });
+  } catch (error) {
+    return new Response(JSON.stringify({ success: false, error: error.message }), { status: 500 });
+  }
 } 
