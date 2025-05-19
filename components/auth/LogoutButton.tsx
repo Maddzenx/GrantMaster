@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useAuth } from './useAuth';
+import { useAuth } from '../../app/lib/auth/AuthContext';
 import { useRouter } from 'next/navigation';
 
 const LogoutButton: React.FC = () => {

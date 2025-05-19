@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useAuth } from './useAuth';
+import { useAuth } from '../../app/lib/auth/AuthContext';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@supabase/supabase-js';
 import LogOutEverywhereButton from '@/components/auth/LogOutEverywhereButton';

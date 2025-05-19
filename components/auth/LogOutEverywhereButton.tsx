@@ -1,4 +1,4 @@
-import { useAuth } from './useAuth';
+import { useAuth } from '../../app/lib/auth/AuthContext';
 
 export default function LogOutEverywhereButton() {
   const { logOutEverywhere, loading } = useAuth();
