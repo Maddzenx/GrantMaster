@@ -1,0 +1,11 @@
+{
+    "cron": [
+      {
+        "path": "/api/grants/sync",
+        "schedule": "0 3 * * *",
+        "headers": {
+          "Authorization": "Bearer <YOUR_SECRET_HERE>"
+        }
+      }
+    ]
+  }
