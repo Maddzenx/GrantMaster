@@ -8,13 +8,17 @@ const supabaseAdmin = createClient(
 );
 
 export async function POST(request: NextRequest) {
-  const { userId } = await request.json();
+  const { sessionToken } = await request.json();
 
-  if (!userId) {
-    return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
+  if (!sessionToken) {
+    return NextResponse.json({ error: 'Missing sessionToken' }, { status: 400 });
   }
 
-  const { error } = await supabaseAdmin.auth.admin.signOutUserSessions(userId);
+  const { error } = await supabaseAdmin.auth.admin.signOut(
+    sessionToken,
+    { scope: 'global' }
+  );
+
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
