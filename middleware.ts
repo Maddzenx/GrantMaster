@@ -1,23 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// Define routes that require authentication
-const protectedRoutes = ['/dashboard', '/profile', '/grants'];
+// List all routes that require authentication
+const protectedRoutes = ['/dashboard', '/profile', '/settings']; // Add more as needed
 
 export function middleware(request: NextRequest) {
-  const { cookies, nextUrl } = request;
-  // Supabase sets 'sb-access-token' or 'supabase-auth-token' cookies
-  const supabaseToken = cookies.get('sb-access-token') || cookies.get('supabase-auth-token');
+  const { pathname } = request.nextUrl;
 
-  // If the route is protected and the user is not authenticated, redirect to login
-  if (protectedRoutes.some((route) => nextUrl.pathname.startsWith(route)) && !supabaseToken) {
-    return NextResponse.redirect(new URL('/login', request.url));
+  // Only check protected routes
+  if (protectedRoutes.some(route => pathname.startsWith(route))) {
+    // Supabase sets cookies like 'sb-access-token' and 'sb-refresh-token'
+    const accessToken = request.cookies.get('sb-access-token') || request.cookies.get('supabase-auth-token');
+
+    if (!accessToken) {
+      // Redirect unauthenticated users to login
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirectedFrom', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
   }
 
-  // Otherwise, continue
+  // Allow the request to proceed
   return NextResponse.next();
 }
 
-// Specify which routes to run the middleware on
+// Optionally, limit middleware to only protected routes for performance
 export const config = {
-  matcher: ['/dashboard/:path*', '/profile/:path*', '/grants/:path*'],
+  matcher: ['/dashboard/:path*', '/profile/:path*', '/settings/:path*'],
 }; 

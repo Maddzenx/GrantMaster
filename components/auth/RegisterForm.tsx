@@ -1,66 +1,96 @@
 'use client';
 
 import React, { useState } from 'react';
-import AuthForm from './AuthForm';
 import { useAuth } from './useAuth';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@supabase/supabase-js';
+import LogOutEverywhereButton from '@/components/auth/LogOutEverywhereButton';
 
-const RegisterForm: React.FC = () => {
+export const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  // No need to specify storage; defaults to localStorage
+);
+
+let logoutTimeout: NodeJS.Timeout | null = null;
+
+const setAutoLogout = (expiresAt: number | undefined, signOut: () => void) => {
+  if (logoutTimeout) clearTimeout(logoutTimeout);
+  if (!expiresAt) return;
+  const msUntilExpiry = expiresAt * 1000 - Date.now();
+
+  if (msUntilExpiry > 60 * 1000) {
+    setTimeout(() => {
+      // Show a warning modal here
+      // e.g., setShowSessionWarning(true);
+    }, msUntilExpiry - 60 * 1000);
+  }
+
+  if (msUntilExpiry > 0) {
+    logoutTimeout = setTimeout(() => {
+      signOut();
+    }, msUntilExpiry);
+  }
+};
+
+export default function RegisterForm() {
   const { signUp } = useAuth();
+  const router = useRouter();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
     setLoading(true);
+    setError('');
+    setSuccess('');
     try {
       await signUp(email, password);
-      // Optionally, show a success message or redirect
+      setSuccess('Registration successful! Redirecting...');
+      setTimeout(() => {
+        router.push('/login'); // Redirect to login or dashboard
+      }, 1500);
     } catch (err: any) {
-      setError(err.message || 'Registration failed');
+      const msg = err.message?.toLowerCase() || '';
+      if (msg.includes('user already registered') || msg.includes('email already in use') || msg.includes('duplicate key')) {
+        setError('This email is already registered. Please log in or use a different email.');
+      } else {
+        setError(err.message || 'Registration failed');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <AuthForm
-      title="Register"
-      onSubmit={handleSubmit}
-      submitText="Sign Up"
-      loading={loading}
-      error={error || undefined}
-    >
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-          Email
-        </label>
-        <input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        />
-      </div>
-      <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-          Password
-        </label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-        />
-      </div>
-    </AuthForm>
+    <form onSubmit={handleSubmit}>
+      <h2>Register</h2>
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+        required
+        disabled={loading}
+      />
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={e => setPassword(e.target.value)}
+        required
+        disabled={loading}
+      />
+      <button type="submit" disabled={loading}>
+        {loading ? 'Registering...' : 'Register'}
+      </button>
+      {error && <div style={{ color: 'red', marginTop: 8 }}>{error}</div>}
+      {success && <div style={{ color: 'green', marginTop: 8 }}>{success}</div>}
+      <LogOutEverywhereButton />
+    </form>
   );
-};
-
-export default RegisterForm; 
+} 

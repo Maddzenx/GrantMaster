@@ -1,9 +1,8 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useEffect, useState, ReactNode } from 'react';
 import { supabase } from '../../app/lib/supabase';
 import type { Session, User } from '@supabase/supabase-js';
-import dayjs from 'dayjs'; // npm install dayjs
 
 interface AuthContextType {
   user: User | null;
@@ -20,35 +19,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  let logoutTimeout: NodeJS.Timeout | null = null;
+
+  const setAutoLogout = (expiresAt: number | undefined) => {
+    if (logoutTimeout) clearTimeout(logoutTimeout);
+    if (!expiresAt) return;
+    const msUntilExpiry = expiresAt * 1000 - Date.now();
+    if (msUntilExpiry > 0) {
+      logoutTimeout = setTimeout(() => {
+        signOut();
+      }, msUntilExpiry);
+    }
+  };
 
   useEffect(() => {
-    let logoutTimeout: NodeJS.Timeout | null = null;
-
-    const setAutoLogout = (expiresAt: number | undefined) => {
-      if (logoutTimeout) clearTimeout(logoutTimeout);
-      if (!expiresAt) return;
-      const msUntilExpiry = expiresAt * 1000 - Date.now();
-      if (msUntilExpiry > 0) {
-        logoutTimeout = setTimeout(() => {
-          // Optionally, show a warning before logout
-          // alert('Session expired. You will be logged out.');
-          signOut();
-        }, msUntilExpiry);
-      }
-    };
-
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-      setAutoLogout(session?.expires_at);
-    });
-
+    // 1. On mount, check for an existing session (session recovery)
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setUser(data.session?.user ?? null);
       setLoading(false);
       setAutoLogout(data.session?.expires_at);
+    });
+
+    // 2. Listen for session changes (login, logout, refresh)
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+      setAutoLogout(session?.expires_at);
     });
 
     return () => {
@@ -57,6 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  // Auth actions
   const signIn = async (email: string, password: string) => {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -75,6 +74,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     const { error } = await supabase.auth.signOut();
     setLoading(false);
+    setUser(null);
+    setSession(null);
     if (error) throw new Error(error.message);
   };
 

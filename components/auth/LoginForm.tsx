@@ -2,23 +2,29 @@
 
 import React, { useState } from 'react';
 import AuthForm from './AuthForm';
+import { useAuth } from './useAuth';
+import { useRouter } from 'next/navigation';
 
-interface LoginFormProps {
-  onLogin: (email: string, password: string) => Promise<void>;
-}
-
-const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
+const LoginForm: React.FC = () => {
+  const { signIn, user, session } = useAuth();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
+    setSuccess(null);
     setLoading(true);
     try {
-      await onLogin(email, password);
+      await signIn(email, password);
+      setSuccess('Login successful! Redirecting...');
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 1000);
     } catch (err: any) {
       setError(err.message || 'Login failed');
     } finally {
@@ -30,7 +36,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
     <AuthForm
       title="Sign In"
       onSubmit={handleSubmit}
-      submitText="Sign In"
+      submitText={loading ? 'Signing In...' : 'Sign In'}
       loading={loading}
       error={error || undefined}
     >
@@ -60,6 +66,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
         />
       </div>
+      {success && <div style={{ color: 'green', marginTop: 8 }}>{success}</div>}
     </AuthForm>
   );
 };

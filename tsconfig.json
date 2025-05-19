@@ -27,7 +27,11 @@
       "jest",
       "node",
       "@testing-library/jest-dom"
-    ]
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["*"]
+    }
   },
   "include": [
     "next-env.d.ts",
