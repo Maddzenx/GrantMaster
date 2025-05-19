@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
   }
 
-  const { error } = await supabaseAdmin.auth.admin.signOutUser(userId);
+  const { error } = await supabaseAdmin.auth.admin.signOutUserSessions(userId);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
