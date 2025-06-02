@@ -59,7 +59,7 @@ export default function RegisterForm() {
       if (msg.includes('user already registered') || msg.includes('email already in use') || msg.includes('duplicate key')) {
         setError('This email is already registered. Please log in or use a different email.');
       } else {
-        setError(err.message || 'Registration failed');
+      setError(err.message || 'Registration failed');
       }
     } finally {
       setLoading(false);
@@ -69,20 +69,20 @@ export default function RegisterForm() {
   return (
     <form onSubmit={handleSubmit}>
       <h2>Register</h2>
-      <input
-        type="email"
+        <input
+          type="email"
         placeholder="Email"
-        value={email}
+          value={email}
         onChange={e => setEmail(e.target.value)}
-        required
+          required
         disabled={loading}
-      />
-      <input
-        type="password"
+        />
+        <input
+          type="password"
         placeholder="Password"
-        value={password}
+          value={password}
         onChange={e => setPassword(e.target.value)}
-        required
+          required
         disabled={loading}
       />
       <button type="submit" disabled={loading}>

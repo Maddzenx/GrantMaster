@@ -1,6 +1,6 @@
 # Task ID: 3
 # Title: Develop Vinnova API Integration Service
-# Status: pending
+# Status: in-progress
 # Dependencies: 1
 # Priority: high
 # Description: Create a service to fetch, parse, and store grant data from the Vinnova GDP API, including a daily synchronization mechanism.
