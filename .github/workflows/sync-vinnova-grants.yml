@@ -1,0 +1,23 @@
+name: Sync Vinnova Grants
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Every day at 2am UTC
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call sync endpoint
+        run: |
+          curl -X POST "https://your-app.vercel.app/api/cron/sync-grants" \
+            -H "x-cron-secret: ${{ secrets.CRON_SECRET }}"
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+
+# Instructions:
+# 1. Set your deployed app URL above (replace your-app.vercel.app).
+# 2. Add a repository secret named CRON_SECRET with the same value as your server's expected secret.
+# 3. The endpoint should be protected and only run the sync if the secret matches.
+# 4. You can manually trigger this workflow from the GitHub Actions tab. 

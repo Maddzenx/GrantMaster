@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from 'react'
-import { supabase } from '../lib/supabase';
+import { supabase } from '../lib/supabaseClient';
 
 const AuthContext = createContext({})
 
@@ -14,12 +14,14 @@ export const AuthProvider = ({ children }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null)
       setLoading(false)
+      console.log('AuthContext user:', user, 'session:', session);
     })
 
     // Listen for changes on auth state (logged in, signed out, etc.)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null)
       setLoading(false)
+      console.log('AuthContext user:', user, 'session:', session);
     })
 
     return () => subscription.unsubscribe()

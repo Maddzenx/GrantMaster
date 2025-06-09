@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Application",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "title": { "type": ["string", "null"] },
+    "status": { "type": ["string", "null"] },
+    "decisionDate": { "type": ["string", "null"], "format": "date" }
+  },
+  "required": ["id"],
+  "additionalProperties": false
+} 

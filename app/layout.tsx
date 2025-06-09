@@ -1,4 +1,7 @@
+import LogoutButton from '@/components/LogOutButton';
 import { AuthProvider } from '../app/lib/auth/AuthContext';
+import { ErrorBoundary } from '../components/ErrorBoundary';
+import SupabaseProviders from './SupabaseProviders';
 
 export const metadata = {
   title: 'Next.js',
@@ -13,9 +16,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <ErrorBoundary>
+          <SupabaseProviders>
+            <AuthProvider>
+              {children}
+            </AuthProvider>
+          </SupabaseProviders>
+        </ErrorBoundary>
       </body>
     </html>
   )

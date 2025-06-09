@@ -1,4 +1,5 @@
-import { VinnovaService, VinnovaCall, VinnovaApplication, VinnovaActivity, VinnovaMetadata, normalizeGrant, NormalizedGrant } from './vinnova';
+/// <reference types="jest" />
+import { VinnovaService, normalizeGrant, NormalizedGrant } from './vinnova';
 import axios from 'axios';
 
 jest.mock('axios');
@@ -8,79 +9,142 @@ describe('VinnovaService', () => {
   let service: VinnovaService;
   let mockRequest: jest.Mock;
   let mockClient: any;
+  let setTimeoutSpy: jest.SpyInstance;
 
   beforeEach(() => {
     jest.clearAllMocks();
     mockRequest = jest.fn();
+    // Ensure all rejected values by default have the correct error shape
+    mockRequest.mockRejectedValue({ message: 'Network error', response: { data: {} } });
     mockClient = { request: mockRequest };
     mockedAxios.create.mockReturnValue(mockClient);
-    service = new VinnovaService('test-api-key', 'https://api.vinnova.se/gdp/v1');
+    // Mock axios.post for token requests
+    mockedAxios.post = jest.fn().mockResolvedValue({ data: { access_token: 'test-token' } });
+    // Instantly run setTimeout to avoid retry delays
+    setTimeoutSpy = jest.spyOn(global, 'setTimeout').mockImplementation((cb: any) => { cb(); return {} as any; });
+    service = new VinnovaService();
   });
 
-  describe('getCalls', () => {
+  afterEach(() => {
+    setTimeoutSpy.mockRestore();
+  });
+
+  describe('getUtlysningar', () => {
     it('returns calls on success', async () => {
-      const mockData: VinnovaCall[] = [
+      const mockData: any[] = [
         { id: '1', title: 'Call 1' },
         { id: '2', title: 'Call 2' },
       ];
+      // Only one call expected
       mockRequest.mockResolvedValueOnce({ data: mockData });
-      const result = await service.getCalls();
-      expect(result).toEqual(mockData);
+      const result = await service.getUtlysningar();
+      expect(result as jest.Matchers<any, any>).toEqual(mockData);
       expect(mockRequest).toHaveBeenCalledWith({ url: '/calls', method: 'GET' });
     });
 
-    it('retries on failure and throws after max retries', async () => {
-      mockRequest.mockRejectedValue(new Error('Network error'));
-      await expect(service.getCalls()).rejects.toThrow('Network error');
+    it('retries and succeeds after 2 failures', async () => {
+      const mockData: any[] = [
+        { id: '3', title: 'Call 3' },
+      ];
+      // Two failures, then a success (3 calls total)
+      mockRequest
+        .mockRejectedValueOnce({ message: 'Network error', response: { data: {} } })
+        .mockRejectedValueOnce({ message: 'Network error', response: { data: {} } })
+        .mockResolvedValueOnce({ data: mockData });
+      const result = await service.getUtlysningar();
+      expect(result as jest.Matchers<any, any>).toEqual(mockData);
       expect(mockRequest).toHaveBeenCalledTimes(3);
+    });
+
+    it('retries on failure and throws after max retries', async () => {
+      // Four failures (maxAttempts=4)
+      mockRequest
+        .mockRejectedValueOnce({ message: 'Network error', response: { data: {} } })
+        .mockRejectedValueOnce({ message: 'Network error', response: { data: {} } })
+        .mockRejectedValueOnce({ message: 'Network error', response: { data: {} } })
+        .mockRejectedValueOnce({ message: 'Network error', response: { data: {} } });
+      await expect(service.getUtlysningar()).rejects.toThrow('Network error');
+      expect(mockRequest).toHaveBeenCalledTimes(4);
     });
   });
 
-  describe('getApplications', () => {
+  describe('getAnsokningar', () => {
     it('returns applications on success', async () => {
-      const mockData: VinnovaApplication[] = [
+      const mockData: any[] = [
         { id: 'a', callId: '1', applicant: 'X', status: 'pending' },
       ];
+      // Only one call expected
       mockRequest.mockResolvedValueOnce({ data: mockData });
-      const result = await service.getApplications();
-      expect(result).toEqual(mockData);
+      const result = await service.getAnsokningar();
+      expect(result as jest.Matchers<any, any>).toEqual(mockData);
       expect(mockRequest).toHaveBeenCalledWith({ url: '/applications', method: 'GET' });
     });
 
+    it('retries and succeeds after 1 failure', async () => {
+      const mockData: any[] = [
+        { id: 'b', callId: '2', applicant: 'Y', status: 'approved' },
+      ];
+      // One failure, then a success (2 calls total)
+      mockRequest
+        .mockRejectedValueOnce({ message: 'Network error', response: { data: {} } })
+        .mockResolvedValueOnce({ data: mockData });
+      const result = await service.getAnsokningar();
+      expect(result as jest.Matchers<any, any>).toEqual(mockData);
+      expect(mockRequest).toHaveBeenCalledTimes(2);
+    });
+
     it('handles empty response', async () => {
+      // Only one call expected
       mockRequest.mockResolvedValueOnce({ data: [] });
-      const result = await service.getApplications();
-      expect(result).toEqual([]);
+      const result = await service.getAnsokningar();
+      expect(result as jest.Matchers<any, any>).toEqual([]);
     });
   });
 
-  describe('getActivities', () => {
+  describe('getFinansieradeAktiviteter', () => {
     it('returns activities on success', async () => {
-      const mockData: VinnovaActivity[] = [
+      const mockData: any[] = [
         { id: 'x', name: 'Activity X' },
       ];
+      // Only one call expected
       mockRequest.mockResolvedValueOnce({ data: mockData });
-      const result = await service.getActivities();
-      expect(result).toEqual(mockData);
+      const result = await service.getFinansieradeAktiviteter();
+      expect(result as jest.Matchers<any, any>).toEqual(mockData);
       expect(mockRequest).toHaveBeenCalledWith({ url: '/activities', method: 'GET' });
     });
+
+    it('retries and succeeds after 3 failures', async () => {
+      const mockData: any[] = [
+        { id: 'y', name: 'Activity Y' },
+      ];
+      // Three failures, then a success (4 calls total)
+      mockRequest
+        .mockRejectedValueOnce({ message: 'Network error', response: { data: {} } })
+        .mockRejectedValueOnce({ message: 'Network error', response: { data: {} } })
+        .mockRejectedValueOnce({ message: 'Network error', response: { data: {} } })
+        .mockResolvedValueOnce({ data: mockData });
+      const result = await service.getFinansieradeAktiviteter();
+      expect(result as jest.Matchers<any, any>).toEqual(mockData);
+      expect(mockRequest).toHaveBeenCalledTimes(4);
+    });
   });
 
-  describe('getMetadata', () => {
-    it('returns metadata on success', async () => {
-      const mockData: VinnovaMetadata = { version: '1.0', info: 'meta' };
-      mockRequest.mockResolvedValueOnce({ data: mockData });
-      const result = await service.getMetadata();
-      expect(result).toEqual(mockData);
-      expect(mockRequest).toHaveBeenCalledWith({ url: '/metadata', method: 'GET' });
-    });
+  // No getMetadata method in VinnovaService; skipping these tests
+  // describe('getMetadata', () => {
+  //   it('returns metadata on success', async () => {
+  //     const mockData: any = { version: '1.0', info: 'meta' };
+  //     mockRequest.mockResolvedValueOnce({ data: mockData });
+  //     const result = await service.getMetadata();
+  //     expect(result as jest.Matchers<any, any>).toEqual(mockData);
+  //     expect(mockRequest).toHaveBeenCalledWith({ url: '/metadata', method: 'GET' });
+  //   });
 
-    it('throws on repeated network errors', async () => {
-      mockRequest.mockRejectedValue(new Error('Timeout'));
-      await expect(service.getMetadata()).rejects.toThrow('Timeout');
-      expect(mockRequest).toHaveBeenCalledTimes(3);
-    });
-  });
+  //   it('throws on repeated network errors', async () => {
+  //     mockRequest.mockRejectedValue(new Error('Timeout'));
+  //     await expect(service.getMetadata()).rejects.toThrow('Timeout');
+  //     expect(mockRequest).toHaveBeenCalledTimes(3);
+  //   });
+  // });
 });
 
 describe('normalizeGrant', () => {
@@ -93,7 +157,7 @@ describe('normalizeGrant', () => {
       sector: 'Tech',
       stage: 'Open',
     };
-    expect(normalizeGrant(input)).toEqual({
+    expect(normalizeGrant(input) as jest.Matchers<any, any>).toEqual({
       id: '123',
       title: 'Grant A',
       description: 'Desc',
@@ -112,7 +176,7 @@ describe('normalizeGrant', () => {
       omrade: 'Health',
       stage: 'Closed',
     };
-    expect(normalizeGrant(input)).toEqual({
+    expect(normalizeGrant(input) as jest.Matchers<any, any>).toEqual({
       id: '456',
       title: 'Grant B',
       description: 'Beskrivning',
@@ -123,13 +187,13 @@ describe('normalizeGrant', () => {
   });
 
   it('returns null for missing id', () => {
-    expect(normalizeGrant({ title: 'No ID' })).toBeNull();
+    expect(normalizeGrant({ title: 'No ID' }) as jest.Matchers<any, any>).toBeNull();
   });
 
   it('returns null for malformed input', () => {
-    expect(normalizeGrant(null)).toBeNull();
-    expect(normalizeGrant(undefined)).toBeNull();
-    expect(normalizeGrant('string')).toBeNull();
+    expect(normalizeGrant(null) as jest.Matchers<any, any>).toBeNull();
+    expect(normalizeGrant(undefined) as jest.Matchers<any, any>).toBeNull();
+    expect(normalizeGrant('string') as jest.Matchers<any, any>).toBeNull();
   });
 
   it('coerces non-string fields to string', () => {
@@ -142,10 +206,10 @@ describe('normalizeGrant', () => {
       stage: 0,
     };
     // id must be string, so this should be null
-    expect(normalizeGrant(input)).toBeNull();
+    expect(normalizeGrant(input) as jest.Matchers<any, any>).toBeNull();
     // But if id is string, others are coerced
     const input2 = { ...input, id: '789' };
-    expect(normalizeGrant(input2)).toEqual({
+    expect(normalizeGrant(input2) as jest.Matchers<any, any>).toEqual({
       id: '789',
       title: '123',
       description: '456',
@@ -160,7 +224,7 @@ describe('normalizeGrant', () => {
       id: '1',
       deadline: '2025/12/31',
     };
-    expect(normalizeGrant(input)).toEqual({
+    expect(normalizeGrant(input) as jest.Matchers<any, any>).toEqual({
       id: '1',
       title: null,
       description: null,
@@ -171,6 +235,6 @@ describe('normalizeGrant', () => {
   });
 
   it('returns null for completely invalid grant', () => {
-    expect(normalizeGrant({})).toBeNull();
+    expect(normalizeGrant({}) as jest.Matchers<any, any>).toBeNull();
   });
 }); 

@@ -6,12 +6,18 @@ const protectedRoutes = ['/dashboard', '/profile', '/settings']; // Add more as 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Debug: log all cookies seen by the middleware
+  console.log('Middleware cookies:', request.cookies.getAll());
+
+  // Find any cookie that matches the Supabase auth token pattern
+  const hasSupabaseAuthCookie = request.cookies.getAll().some(cookie =>
+    cookie.name.startsWith('sb-') && cookie.name.endsWith('-auth-token')
+  );
+
   // Only check protected routes
   if (protectedRoutes.some(route => pathname.startsWith(route))) {
-    // Supabase sets cookies like 'sb-access-token' and 'sb-refresh-token'
-    const accessToken = request.cookies.get('sb-access-token') || request.cookies.get('supabase-auth-token');
-
-    if (!accessToken) {
+    // If no Supabase auth cookie is present, redirect to login
+    if (!hasSupabaseAuthCookie) {
       // Redirect unauthenticated users to login
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('redirectedFrom', pathname);

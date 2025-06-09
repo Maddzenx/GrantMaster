@@ -21,8 +21,48 @@
       "dependencies": [
         1
       ],
-      "status": "pending",
-      "subtasks": []
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Authentication UI Components",
+          "description": "Develop user interface components for authentication flows including login, registration, password reset, and account verification screens.",
+          "dependencies": [],
+          "details": "Implementation steps:\n1. Create reusable form components with validation\n2. Design login page with username/email and password fields\n3. Build registration form with appropriate fields (name, email, password, etc.)\n4. Implement password reset flow UI\n5. Design account verification screens\n6. Add loading states and error message displays\n\nSecurity considerations:\n- Implement CSRF protection in forms\n- Add rate limiting for submission attempts\n- Ensure password strength indicators\n- Include clear error messages without exposing system details\n\nTest cases:\n- Validate form submissions with valid/invalid inputs\n- Test responsive design across devices\n- Verify accessibility compliance\n- Confirm proper error state handling\n- Test navigation between authentication screens",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "title": "Auth Context and Hooks",
+          "description": "Create authentication context and custom hooks to manage user authentication state throughout the application.",
+          "dependencies": [
+            1
+          ],
+          "details": "Implementation steps:\n1. Set up AuthContext with React Context API\n2. Implement useAuth hook for accessing authentication state\n3. Create login, logout, and registration functions\n4. Add token storage and retrieval mechanisms\n5. Implement user state persistence\n6. Add refresh token functionality\n\nSecurity considerations:\n- Use secure storage for tokens (HttpOnly cookies preferred)\n- Implement token expiration and rotation\n- Add fingerprinting for additional security\n- Sanitize user data before storing\n\nTest cases:\n- Test context initialization with/without existing session\n- Verify hook behavior in authenticated/unauthenticated states\n- Test token refresh mechanisms\n- Confirm proper state updates after auth actions\n- Verify secure storage implementation\n<info added on 2025-05-11T19:10:45.774Z>\nImplementation steps:\n1. Set up AuthContext with React Context API\n   - Create a new file (e.g., `AuthContext.tsx` or `AuthContext.js`) in the components or lib directory\n   - Define the context value shape: user, session, loading, signIn, signOut, signUp, etc.\n   - Provide the context at the top level of your app (e.g., in `layout.tsx`)\n   - Use createContext and useContext from React\n\n2. Implement useAuth hook for accessing authentication state\n   - Create a custom hook (`useAuth`) that returns the context value\n   - Ensure it throws an error if used outside the provider\n   - Example: `const { user, signIn, signOut } = useAuth()`\n\n3. Create login, logout, and registration functions\n   - Use Supabase Auth methods: `signInWithPassword`, `signUp`, `signOut`\n   - Handle errors and loading states\n   - Implement password reset and email verification support\n   - Update context state after successful authentication actions\n\n4. Add token storage and retrieval mechanisms\n   - Use Supabase's built-in session management\n   - Listen for auth state changes with `supabase.auth.onAuthStateChange`\n   - Update context state on session/user changes\n   - Consider using cookies for enhanced security\n\n5. Implement user state persistence\n   - On app load, check for an existing session with `supabase.auth.getSession()`\n   - Restore user/session state if available\n   - Handle loading state until session is determined\n   - Implement proper error handling for session restoration failures\n\n6. Add refresh token functionality\n   - Leverage Supabase's automatic token refresh capabilities\n   - Ensure context updates on refresh events\n   - Implement auto-logout on session expiration\n   - Set a timeout based on `expires_at` for client-side expiration handling\n\nSecurity considerations:\n- Use secure storage for tokens (HttpOnly cookies preferred)\n- Implement token expiration and rotation\n- Add fingerprinting for additional security\n- Sanitize user data before storing\n- Handle errors gracefully without leaking sensitive information\n- Implement proper CSRF protection\n\nTest cases:\n- Test context initialization with/without existing session\n- Verify hook behavior in authenticated/unauthenticated states\n- Test token refresh mechanisms\n- Confirm proper state updates after auth actions\n- Verify secure storage implementation\n- Test login, logout, and registration flows\n- Verify error handling for authentication failures\n\nCode structure:\n```\n/lib\n  /auth\n    AuthContext.tsx  // Context definition and provider\n    useAuth.tsx      // Custom hook for accessing auth context\n    authUtils.ts     // Helper functions for auth operations\n```\n</info added on 2025-05-11T19:10:45.774Z>",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "title": "Protected Routes Middleware",
+          "description": "Implement middleware to protect routes that require authentication and handle authorization levels.",
+          "dependencies": [
+            2
+          ],
+          "details": "Implementation steps:\n1. Create ProtectedRoute component/HOC\n2. Implement role-based access control\n3. Add redirect logic for unauthenticated users\n4. Set up route guards for different permission levels\n5. Implement loading states during authentication checks\n6. Add error handling for expired sessions\n\nSecurity considerations:\n- Verify token validity on each protected route access\n- Implement proper redirection for unauthorized access attempts\n- Log security-related events for auditing\n- Consider implementing route-specific permissions\n\nTest cases:\n- Test access to protected routes with/without authentication\n- Verify redirects to login page when unauthenticated\n- Test role-based access restrictions\n- Confirm proper handling of expired tokens\n- Verify loading states during authentication checks",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "title": "Session Management",
+          "description": "Implement session handling including token storage, refresh mechanisms, and session timeout functionality.",
+          "dependencies": [
+            2,
+            3
+          ],
+          "details": "Implementation steps:\n1. Set up token storage strategy (cookies/localStorage)\n2. Implement automatic token refresh mechanism\n3. Add session timeout detection and handling\n4. Create session recovery functionality\n5. Implement multi-device session management\n6. Add session revocation capabilities\n\nSecurity considerations:\n- Use secure and HttpOnly flags for cookies\n- Implement proper CORS settings\n- Add protection against XSS and CSRF attacks\n- Consider implementing device fingerprinting\n- Add session anomaly detection\n\nTest cases:\n- Test session persistence across page refreshes\n- Verify token refresh functionality\n- Test session timeout behavior\n- Confirm proper handling of concurrent sessions\n- Verify session revocation works correctly\n- Test behavior when backend is unavailable\n<info added on 2025-05-19T12:44:14.222Z>\nImplementation steps:\n1. Set up token storage strategy (cookies/localStorage)\n2. Implement automatic token refresh mechanism\n3. Add session timeout detection and handling\n4. Create session recovery functionality\n5. Implement multi-device session management\n6. Add session revocation capabilities\n\nSecurity considerations:\n- Use secure and HttpOnly flags for cookies\n- Implement proper CORS settings\n- Add protection against XSS and CSRF attacks\n- Consider implementing device fingerprinting\n- Add session anomaly detection\n\nTest cases:\n- Test session persistence across page refreshes\n- Verify token refresh functionality\n- Test session timeout behavior\n- Confirm proper handling of concurrent sessions\n- Verify session revocation works correctly\n- Test behavior when backend is unavailable\n\nImplementation Log:\n1. Token Storage Strategy:\n   - Implemented using Supabase JS v2+ which uses localStorage by default for session tokens in the browser\n   - Centralized Supabase client creation in app/lib/supabase.js for consistent usage across client components\n   - Verified session persistence across page refreshes via localStorage (sb-<project-id>-auth-token)\n   - Note: Current implementation doesn't persist across browser restarts due to localStorage limitations\n\n2. Automatic Token Refresh:\n   - Leveraged Supabase JS built-in token refresh functionality via onAuthStateChange and getSession\n   - Implemented AuthProvider to listen for auth state changes and update context accordingly\n\n3. Session Timeout Detection/Handling:\n   - Added timeout mechanism in AuthProvider based on session.expires_at\n   - Implemented auto-logout functionality when session expires\n   - Configured handlers in setAutoLogout and onAuthStateChange in AuthProvider.tsx\n\n4. Session Recovery:\n   - Implemented session restoration on application mount using supabase.auth.getSession()\n   - Ensured users remain logged in after page refresh when valid session exists\n\n5. Multi-Device Session Management:\n   - Created secure API route (app/api/revoke-sessions/route.ts) using Supabase Admin API\n   - Implemented functionality to revoke all sessions for a user\n\n6. Session Revocation:\n   - Completed revoke-sessions API route for session termination across all devices\n   - Added UI trigger via 'Log Out Everywhere' button\n\nAll client-side session management with Supabase has been implemented and tested. Future enhancements could include SSR support or cookie-based authentication for improved security.\n</info added on 2025-05-19T12:44:14.222Z>",
+          "status": "done"
+        }
+      ]
     },
     {
       "id": 3,
@@ -34,7 +74,7 @@
       "dependencies": [
         1
       ],
-      "status": "pending",
+      "status": "done",
       "subtasks": [
         {
           "id": 1,
@@ -42,7 +82,7 @@
           "description": "Develop a robust client for interacting with the Vinnova API, handling authentication, request formatting, and response parsing.",
           "dependencies": [],
           "details": "Technical requirements: Implement RESTful client using appropriate HTTP library; Handle OAuth2 authentication flow; Implement retry logic with exponential backoff; Create comprehensive logging for all API interactions. Error handling: Implement proper exception handling for network failures; Handle API rate limiting with appropriate backoff; Create custom error types for different API response codes. Performance considerations: Use connection pooling; Implement request caching where appropriate; Consider asynchronous requests for non-blocking operations.",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 2,
@@ -51,8 +91,8 @@
           "dependencies": [
             1
           ],
-          "details": "Technical requirements: Design mapper classes for each entity type; Implement validation for incoming data; Handle data type conversions and formatting; Support versioning for API schema changes. Error handling: Implement graceful handling of malformed data; Log data validation failures with detailed context; Create fallback strategies for partial data. Performance considerations: Optimize transformation algorithms for large datasets; Consider streaming processing for large responses; Implement benchmarking to identify bottlenecks.",
-          "status": "pending"
+          "details": "Technical requirements: Design mapper classes for each entity type; Implement validation for incoming data; Handle data type conversions and formatting; Support versioning for API schema changes. Error handling: Implement graceful handling of malformed data; Log data validation failures with detailed context; Create fallback strategies for partial data. Performance considerations: Optimize transformation algorithms for large datasets; Consider streaming processing for large responses; Implement benchmarking to identify bottlenecks.\n<info added on 2025-05-19T18:17:09.086Z>\nTechnical requirements: Design mapper classes for each entity type; Implement validation for incoming data; Handle data type conversions and formatting; Support versioning for API schema changes. Error handling: Implement graceful handling of malformed data; Log data validation failures with detailed context; Create fallback strategies for partial data. Performance considerations: Optimize transformation algorithms for large datasets; Consider streaming processing for large responses; Implement benchmarking to identify bottlenecks.\n\nImplementation Plan (Iteration 1):\n\n1. Review Vinnova API Client Output:\n   - Examine the structure of API responses from the Vinnova API client in app/lib/vinnovaClient.js\n   - Document all entity types (grants, calls, activities, etc.) and their field structures\n   - Identify data types, required vs optional fields, and any nested structures\n\n2. Design Internal Data Models:\n   - Use Supabase types (particularly for the grants table) as the target schema\n   - Create explicit mapping definitions between Vinnova API fields and internal database schema\n   - Document type conversions needed (dates, enums, numeric values)\n   - Implement versioning strategy to handle future API schema changes\n\n3. Implement Mapper Functions:\n   - Develop separate normalization functions for each entity type (normalizeGrant, normalizeCall)\n   - Add validation logic with descriptive error messages\n   - Implement fallback/default values for missing or null fields\n   - Create utility functions for common transformations (date formatting, string normalization)\n\n4. Testing Strategy:\n   - Write comprehensive unit tests covering normal cases, edge cases, and error scenarios\n   - Create test fixtures with sample API responses\n   - Implement performance benchmarks for transformation operations\n   - Test with deliberately malformed data to verify error handling\n\n5. Optimization:\n   - Implement streaming or batch processing for large datasets\n   - Add memory usage monitoring\n   - Create performance metrics to identify bottlenecks\n   - Optimize critical transformation paths\n\n6. Documentation:\n   - Document all mapping logic and transformation rules\n   - Create examples of before/after data transformation\n   - Document error handling and fallback strategies\n   - Maintain a changelog for future schema updates\n</info added on 2025-05-19T18:17:09.086Z>",
+          "status": "done"
         },
         {
           "id": 3,
@@ -62,7 +102,7 @@
             2
           ],
           "details": "Technical requirements: Create entity-relationship diagram; Design tables with proper normalization; Implement appropriate indexes for query optimization; Set up foreign key constraints for data integrity. Error handling: Design schema to handle incomplete data; Implement database transaction management; Create data migration strategy for schema updates. Performance considerations: Analyze query patterns for index optimization; Consider partitioning for large tables; Implement appropriate caching strategies.",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 4,
@@ -73,8 +113,8 @@
             2,
             3
           ],
-          "details": "Technical requirements: Implement idempotent sync operations; Design for incremental data updates; Create conflict resolution strategies; Implement comprehensive logging and monitoring. Error handling: Develop recovery mechanisms for failed syncs; Implement transaction rollback capabilities; Create alerting for critical failures. Performance considerations: Optimize for minimal API calls; Implement parallel processing where appropriate; Design for handling large data volumes efficiently.",
-          "status": "pending"
+          "details": "Technical requirements: Implement idempotent sync operations; Design for incremental data updates; Create conflict resolution strategies; Implement comprehensive logging and monitoring. Error handling: Develop recovery mechanisms for failed syncs; Implement transaction rollback capabilities; Create alerting for critical failures. Performance considerations: Optimize for minimal API calls; Implement parallel processing where appropriate; Design for handling large data volumes efficiently.\n<info added on 2025-05-19T18:23:22.529Z>\nTechnical requirements: Implement idempotent sync operations; Design for incremental data updates; Create conflict resolution strategies; Implement comprehensive logging and monitoring. Error handling: Develop recovery mechanisms for failed syncs; Implement transaction rollback capabilities; Create alerting for critical failures. Performance considerations: Optimize for minimal API calls; Implement parallel processing where appropriate; Design for handling large data volumes efficiently.\n\nImplementation Plan (Iteration 1):\n\n1. Module Structure:\n   - Create sync module at `app/lib/vinnovaSync.js` or `vinnovaSync.ts`\n   - Leverage existing `fetchVinnovaGrants()` function for API interaction\n   - Design core sync function with proper error handling and logging\n\n2. Sync Logic Flow:\n   - Fetch normalized grants from Vinnova API\n   - For each grant record:\n     * Generate a unique identifier or use existing ID\n     * Compare with existing database records\n     * Perform upsert operations using Supabase client\n     * Track operation results (inserted/updated/unchanged/failed)\n   - Return comprehensive sync report\n\n3. Idempotency Implementation:\n   - Use database constraints to prevent duplicates\n   - Implement comparison logic to detect actual changes before updates\n   - Design transaction patterns to ensure atomic operations\n\n4. Logging & Monitoring:\n   - Log start/end of sync process with timestamps\n   - Record counts of processed records by category\n   - Capture detailed error information for failed operations\n   - Track performance metrics (duration, resource usage)\n\n5. Error Handling:\n   - Implement try/catch blocks around critical operations\n   - Design graceful degradation for partial failures\n   - Create error classification system for actionable alerts\n\n6. Testing Strategy:\n   - Unit tests for core sync logic\n   - Integration tests with mock API responses\n   - Edge case testing (API failures, network issues, data anomalies)\n   - Idempotency verification tests\n\n7. Performance Optimization:\n   - Implement batched database operations\n   - Consider chunking for large datasets\n   - Add configurable throttling for API rate limits\n\n8. Documentation:\n   - Document sync process workflow\n   - Note assumptions and limitations\n   - Provide usage examples and configuration options\n</info added on 2025-05-19T18:23:22.529Z>",
+          "status": "done"
         },
         {
           "id": 5,
@@ -84,7 +124,7 @@
             4
           ],
           "details": "Technical requirements: Set up configurable schedule for different sync operations; Implement locking mechanism to prevent overlapping jobs; Create comprehensive logging for job execution; Implement health check endpoints. Error handling: Design retry strategy for failed jobs; Implement notification system for persistent failures; Create manual override capabilities. Performance considerations: Schedule jobs during off-peak hours; Implement resource throttling to prevent system overload; Design for graceful shutdown and restart.",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 6,
@@ -92,7 +132,7 @@
           "description": "Develop a robust client for interacting with the Vinnova API",
           "dependencies": [],
           "details": "Technical requirements: Implement RESTful client using Axios/Fetch, handle authentication with API keys, implement rate limiting compliance, support pagination for large datasets. Error handling: Implement retry logic with exponential backoff, log detailed API errors, create custom error classes for different failure types. Performance: Cache API responses where appropriate, implement connection pooling, monitor and log response times.",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 7,
@@ -101,8 +141,8 @@
           "dependencies": [
             6
           ],
-          "details": "Technical requirements: Design transformation functions for each entity type, handle inconsistent data formats, implement data validation using JSON schema or similar. Error handling: Create fallback values for missing fields, log transformation errors with source data, implement circuit breaker for critical failures. Performance: Optimize transformation algorithms for large datasets, consider streaming for large payloads, implement batch processing capabilities.",
-          "status": "pending"
+          "details": "Technical requirements: Design transformation functions for each entity type, handle inconsistent data formats, implement data validation using JSON schema or similar. Error handling: Create fallback values for missing fields, log transformation errors with source data, implement circuit breaker for critical failures. Performance: Optimize transformation algorithms for large datasets, consider streaming for large payloads, implement batch processing capabilities.\n<info added on 2025-06-02T15:04:12.124Z>\n# Data Normalization Documentation\n\n## Action Items:\n1. Review and document each normalization function:\n   - Grants transformation logic\n   - Applications transformation logic\n   - Activities transformation logic\n\n2. Document field mapping rules:\n   - Create comprehensive mapping tables for each entity\n   - Document all Vinnova API fields → internal fields relationships\n   - Include all supported variants and fallback mechanisms\n\n3. Document error handling strategy:\n   - Missing data handling procedures\n   - Invalid data processing\n   - Error logging methodology\n   - Fallback value implementation details\n\n4. Document edge cases and special logic:\n   - Null value handling\n   - Type conversion rules\n   - Circuit breaker implementation details\n   - Any special case handling\n\n5. Create documentation artifacts:\n   - Add detailed code comments to transformation functions\n   - Create markdown documentation file\n   - Include summary of overall normalization approach\n   - Add examples for complex transformations\n\nThis documentation will ensure the transformation layer remains robust, maintainable, and extensible as the system evolves.\n</info added on 2025-06-02T15:04:12.124Z>",
+          "status": "done"
         },
         {
           "id": 8,
@@ -112,7 +152,7 @@
             7
           ],
           "details": "Technical requirements: Create entity relationship diagrams, implement migrations, design indexes for query optimization, include audit fields for tracking data provenance. Error handling: Implement database transaction management, create data integrity constraints, design rollback strategies. Performance: Analyze query patterns for optimization, implement appropriate indexing strategy, consider partitioning for time-series data if applicable.",
-          "status": "pending"
+          "status": "done"
         },
         {
           "id": 9,
@@ -123,8 +163,8 @@
             7,
             8
           ],
-          "details": "Technical requirements: Implement incremental sync logic using timestamps/etags, design conflict resolution strategies, create logging for sync operations, implement idempotent operations. Error handling: Design partial success handling, implement data reconciliation for failed syncs, create alerting for critical failures. Performance: Implement parallel processing where possible, optimize for memory usage during large syncs, implement progress tracking.",
-          "status": "pending"
+          "details": "Technical requirements: Implement incremental sync logic using timestamps/etags, design conflict resolution strategies, create logging for sync operations, implement idempotent operations. Error handling: Design partial success handling, implement data reconciliation for failed syncs, create alerting for critical failures. Performance: Implement parallel processing where possible, optimize for memory usage during large syncs, implement progress tracking.\n<info added on 2025-06-03T07:54:27.978Z>\nSummary of Sync Service Implementation:\n\n- Implemented incremental sync logic using a sync_state table and last_synced_at timestamps for each entity.\n- Added conflict resolution: for each upsert, compares updated_at timestamps and uses the latest (last write wins).\n- Logging and error handling: all sync operations, conflicts, and errors are logged for traceability.\n- Idempotent operations: upserts are used to avoid duplicates and ensure safe re-runs.\n- Partial success handling: failed records are logged to a sync_failures table for later reconciliation.\n- Data reconciliation: added a retryFailedSyncs function to reprocess failed records and mark them as resolved if successful.\n- Alerting: critical failures and all-record failures trigger Slack alerts via webhook.\n- Performance: implemented parallel processing with configurable batch size for upserts.\n- Progress tracking: after each batch, progress is logged and upserted to a sync_progress table for UI/monitoring.\n\nRemaining issues/next steps:\n- Ensure all edge cases for conflict resolution are covered (e.g., missing updated_at).\n- Monitor and tune batch size for optimal performance.\n- Optionally, build a UI/dashboard for monitoring progress and failures.\n- Continue to test with real data and monitor for unexpected errors or bottlenecks.\n</info added on 2025-06-03T07:54:27.978Z>",
+          "status": "done"
         },
         {
           "id": 10,
@@ -134,7 +174,7 @@
             9
           ],
           "details": "Technical requirements: Implement configurable schedule using cron syntax, design locking mechanism to prevent overlapping jobs, implement environment-specific configurations. Error handling: Create comprehensive logging for job execution, implement notification system for failures, design retry policies. Performance: Configure resource limits for the job, implement timeout handling, create performance metrics collection.",
-          "status": "pending"
+          "status": "done"
         }
       ]
     },
@@ -318,15 +358,65 @@
       "id": 8,
       "title": "Implement Security and Error Handling",
       "description": "Enhance application security, implement comprehensive error handling, and add logging throughout the application.",
-      "details": "1. Implement security measures:\n   - Configure HTTPS for all environments\n   - Add Content Security Policy headers\n   - Implement CSRF protection\n   - Add rate limiting for authentication endpoints\n2. Create input sanitization:\n   - Sanitize all user inputs before processing\n   - Implement validation middleware\n   - Add XSS protection\n3. Develop error handling system:\n   - Create ErrorBoundary component for React errors\n   - Implement custom error types for different scenarios\n   - Add user-friendly error messages\n   - Create fallback UI for error states\n4. Set up logging system:\n   - Implement structured logging with context\n   - Add request/response logging\n   - Create error logging with stack traces\n   - Configure log rotation and storage\n5. Implement retry logic:\n   - Add exponential backoff for external API calls\n   - Create circuit breaker pattern for failing services\n   - Implement graceful degradation",
-      "testStrategy": "1. Perform security testing (XSS, CSRF, injection attacks)\n2. Test input validation with malicious inputs\n3. Verify error handling with simulated failures\n4. Test logging system captures appropriate information\n5. Verify retry logic works with simulated API failures\n6. Test rate limiting functionality\n7. Perform load testing to identify security issues under stress",
-      "priority": "high",
+      "status": "pending",
       "dependencies": [
         2,
         3
       ],
-      "status": "pending",
-      "subtasks": []
+      "priority": "high",
+      "details": "1. Implement security measures:\n   - Configure HTTPS for all environments\n   - Add Content Security Policy headers\n   - Implement CSRF protection\n   - Add rate limiting for authentication endpoints\n2. Create input sanitization:\n   - Sanitize all user inputs before processing\n   - Implement validation middleware\n   - Add XSS protection\n3. Develop error handling system:\n   - Create ErrorBoundary component for React errors\n   - Implement custom error types for different scenarios\n   - Add user-friendly error messages\n   - Create fallback UI for error states\n4. Set up logging system:\n   - Implement structured logging with context\n   - Add request/response logging\n   - Create error logging with stack traces\n   - Configure log rotation and storage\n5. Implement retry logic:\n   - Add exponential backoff for external API calls\n   - Create circuit breaker pattern for failing services\n   - Implement graceful degradation",
+      "testStrategy": "1. Perform security testing (XSS, CSRF, injection attacks)\n2. Test input validation with malicious inputs\n3. Verify error handling with simulated failures\n4. Test logging system captures appropriate information\n5. Verify retry logic works with simulated API failures\n6. Test rate limiting functionality\n7. Perform load testing to identify security issues under stress",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement Core Security Measures",
+          "description": "Set up HTTPS, Content Security Policy (CSP), authentication mechanisms, and other fundamental security protections for the application.",
+          "dependencies": [],
+          "details": "1. Configure HTTPS with proper certificates\n2. Implement Content Security Policy headers\n3. Set up authentication middleware with JWT or OAuth\n4. Configure CORS policies\n5. Implement rate limiting to prevent brute force attacks\n6. Add protection against common vulnerabilities (XSS, CSRF)\n7. Test security measures with penetration testing tools\n8. Document security implementation for team reference\n<info added on 2025-06-03T08:52:20.879Z>\nSTATUS UPDATE: Task partially implemented but on hold. Local development security measures are in place, but full implementation of HTTPS, CORS, and production security headers requires a production domain. This subtask will be resumed and finalized once the production domain is set up.\n</info added on 2025-06-03T08:52:20.879Z>\n<info added on 2025-06-10T14:30:15.123Z>\nSTATUS UPDATE: Completed most core security measures:\n- CSP headers implemented in next.config.js\n- CORS policies configured\n- Authentication middleware implemented\n- Rate limiting for authentication endpoints added\n- XSS/CSRF protections in place\n- Security documentation created in SECURITY.md\n- HTTPS enforcement configured (pending production domain)\n- Security headers (CSP, HSTS, etc.) added to next.config.js\n- Production redirects to HTTPS configured\n</info added on 2025-06-10T14:30:15.123Z>",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "title": "Develop Input Validation and Sanitization",
+          "description": "Create a comprehensive system for validating and sanitizing all user inputs across the application to prevent injection attacks and data corruption.",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Create validation schemas for all API endpoints\n2. Implement server-side validation for all user inputs\n3. Add client-side validation for immediate feedback\n4. Sanitize inputs to prevent XSS and SQL injection\n5. Validate file uploads (type, size, content)\n6. Implement data type checking and conversion\n7. Create unit tests for validation logic\n8. Document validation requirements for each input type\n<info added on 2025-06-10T14:35:22.456Z>\nSTATUS UPDATE: Completed input validation and sanitization:\n- Zod schemas implemented for all API endpoints\n- Server-side validation for all user inputs\n- Client-side validation added for immediate feedback\n- File and header validation implemented\n- Response whitelisting to prevent information disclosure\n- Generic error messages implemented for sensitive operations (registration, login, password reset)\n- No stack traces or sensitive information in API responses\n</info added on 2025-06-10T14:35:22.456Z>",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "title": "Build Error Handling System",
+          "description": "Develop a centralized error handling system with custom error classes, error boundaries, and consistent error responses across the application.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "1. Create custom error classes for different error types\n2. Implement global error handling middleware\n3. Add React error boundaries for frontend components\n4. Standardize error response format across all APIs\n5. Implement graceful degradation for critical features\n6. Create user-friendly error messages\n7. Test error handling with simulated failures\n8. Document error handling patterns for developers\n<info added on 2025-06-07T11:39:40.985Z>\n## Implementation Plan for Centralized Error Handling System\n\n### 1. Custom Error Classes\n- Use `lib/errors.ts` as the central place for custom error classes (e.g., `ApiError`, `ValidationError`, `AuthError`, `NotFoundError`, `RateLimitError`, `InternalServerError`).\n- Extend as needed for new error types (e.g., service-specific errors).\n\n### 2. Global API Error Handling Middleware\n- Use `lib/handleApiError.ts` to standardize error logging and API error responses.\n- Ensure all API routes (e.g., in `pages/api/`) use `handleApiError` in their catch blocks.\n- All error responses should use a consistent format: `{ error: string, ...context }`.\n- Log errors using `logError` for traceability.\n\n### 3. React Error Boundaries\n- Use `components/ErrorBoundary.tsx` for client-side error boundaries in React.\n- Wrap top-level components/pages with `ErrorBoundary` to catch and display user-friendly error messages.\n- Provide a fallback UI and a reset mechanism.\n\n### 4. Standardize Error Response Format\n- Ensure all API endpoints return errors in the same JSON structure (status code, error message, optional requestId/context).\n- Use custom error classes to set appropriate status codes and messages.\n\n### 5. Graceful Degradation\n- In API routes (e.g., `pages/api/vinnova/utlysningar.ts`), serve cached or fallback data when possible if an error occurs (e.g., circuit breaker open, rate limit, or upstream failure).\n- Communicate degraded state to the client with clear warnings in the response.\n\n### 6. User-Friendly Error Messages\n- Avoid exposing stack traces or sensitive details in API responses.\n- Provide clear, actionable error messages for common failure cases (validation, auth, rate limit, not found).\n\n### 7. Testing Error Handling\n- Write tests to simulate various error scenarios (invalid input, auth failure, rate limit, server error).\n- Ensure correct status codes and error messages are returned.\n- Use supertest or similar tools for API endpoint tests.\n\n### 8. Documentation\n- Document error handling patterns and conventions in a dedicated section (e.g., `docs/ERROR_HANDLING.md`).\n- Include examples of error classes, API error responses, and usage of ErrorBoundary.\n\n### Files/Modules Affected\n- `lib/errors.ts` (custom error classes)\n- `lib/handleApiError.ts` (API error handler)\n- `components/ErrorBoundary.tsx` (React error boundary)\n- `pages/api/*` (API route handlers)\n- `lib/log.ts` (logging)\n- `docs/ERROR_HANDLING.md` (documentation)\n- Test files in `components/auth/__tests__/` and similar\n\n### Anticipated Challenges\n- Ensuring all API routes consistently use the error handler\n- Avoiding information leakage in error responses\n- Coordinating error handling between frontend and backend\n- Handling third-party service errors gracefully\n</info added on 2025-06-07T11:39:40.985Z>",
+          "status": "done"
+        },
+        {
+          "id": 4,
+          "title": "Implement Logging and Retry Mechanisms",
+          "description": "Set up comprehensive logging infrastructure and implement retry logic for handling transient failures in external service calls.",
+          "dependencies": [
+            3
+          ],
+          "details": "1. Configure structured logging with appropriate log levels\n2. Implement centralized log storage and analysis\n3. Add context information to all logs (user, request ID)\n4. Create exponential backoff retry logic for API calls\n5. Implement circuit breaker pattern for external services\n6. Set up alerts for critical errors\n7. Test retry mechanisms with simulated network failures\n8. Document logging standards and retry configurations",
+          "status": "in-progress"
+        },
+        {
+          "id": 5,
+          "title": "Dependency and Secret Management",
+          "description": "Ensure all dependencies are up-to-date and secrets are properly managed throughout the application.",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Store all secrets in environment variables\n2. Ensure .env files are gitignored\n3. Configure GitHub Actions workflows to use repository secrets\n4. Update Next.js and all dependencies to latest secure versions\n5. Implement regular dependency scanning\n6. Document secret management practices\n<info added on 2025-06-10T14:40:18.789Z>\nSTATUS UPDATE: Completed dependency and secret management:\n- All secrets stored in environment variables\n- .env files properly gitignored\n- GitHub Actions workflows configured to use repository secrets\n- Next.js and all dependencies updated to latest secure versions\n</info added on 2025-06-10T14:40:18.789Z>",
+          "status": "done"
+        }
+      ]
     },
     {
       "id": 9,

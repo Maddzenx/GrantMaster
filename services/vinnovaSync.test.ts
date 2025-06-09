@@ -1,5 +1,8 @@
+/// <reference types="jest" />
+// @jest-environment node
 import { syncVinnovaGrants, SyncReport } from './vinnovaSync';
 import { VinnovaService, NormalizedGrant } from './vinnova';
+import * as vinnovaSyncModule from './vinnovaSync';
 
 // Only mock VinnovaService, not the whole module
 jest.mock('./vinnova', () => {
@@ -11,17 +14,23 @@ jest.mock('./vinnova', () => {
 });
 const MockedVinnovaService = VinnovaService as jest.MockedClass<typeof VinnovaService>;
 
+// Mock resolveConflictAndUpsert at the module level
+jest.mock('./vinnovaSync', () => {
+  const actual = jest.requireActual('./vinnovaSync');
+  return {
+    ...actual,
+    resolveConflictAndUpsert: jest.fn().mockResolvedValue(undefined),
+  };
+});
+
 // Helper to create a fresh supabase mock for each test
 function createSupabaseMock() {
   const single = jest.fn();
   const upsert = jest.fn();
-  const chain = {
-    select: jest.fn(() => chain),
-    eq: jest.fn(() => chain),
+  return {
     single,
     upsert,
   };
-  return { chain, single, upsert };
 }
 
 let supabase: any;
@@ -36,15 +45,19 @@ beforeEach(() => {
   jest.clearAllMocks();
   const mock = createSupabaseMock();
   supabase = require('../app/lib/supabase.js').supabase;
-  supabase.from.mockImplementation(() => mock.chain);
   supabase._mock = mock; // for access in tests
   // Reset VinnovaService mock
   MockedVinnovaService.mockClear();
+  // Reset the mock implementation for resolveConflictAndUpsert
+  (vinnovaSyncModule.resolveConflictAndUpsert as jest.Mock).mockImplementation(async (table, record) => {
+    // Default: do nothing (simulate success)
+    return;
+  });
 });
 
 describe('syncVinnovaGrants', () => {
   it('inserts new grants', async () => {
-    MockedVinnovaService.prototype.getCalls = jest.fn().mockResolvedValue([
+    MockedVinnovaService.prototype.getUtlysningar = jest.fn().mockResolvedValue([
       { id: '1', title: 'A' },
       { id: '2', title: 'B' },
     ]);
@@ -62,7 +75,7 @@ describe('syncVinnovaGrants', () => {
   });
 
   it('updates changed grants and leaves unchanged grants', async () => {
-    MockedVinnovaService.prototype.getCalls = jest.fn().mockResolvedValue([
+    MockedVinnovaService.prototype.getUtlysningar = jest.fn().mockResolvedValue([
       { id: '1', title: 'A' },
       { id: '2', title: 'B' },
     ]);
@@ -79,7 +92,7 @@ describe('syncVinnovaGrants', () => {
   });
 
   it('handles upsert errors', async () => {
-    MockedVinnovaService.prototype.getCalls = jest.fn().mockResolvedValue([{ id: '1', title: 'A' }]);
+    MockedVinnovaService.prototype.getUtlysningar = jest.fn().mockResolvedValue([{ id: '1', title: 'A' }]);
     supabase._mock.single.mockResolvedValueOnce({ data: null, error: { code: 'PGRST116' } });
     supabase._mock.upsert.mockResolvedValueOnce({ data: null, error: { message: 'DB error' } });
     const report: SyncReport = await syncVinnovaGrants();
@@ -88,14 +101,14 @@ describe('syncVinnovaGrants', () => {
   });
 
   it('handles fetch errors', async () => {
-    MockedVinnovaService.prototype.getCalls = jest.fn().mockRejectedValue(new Error('API fail'));
+    MockedVinnovaService.prototype.getUtlysningar = jest.fn().mockRejectedValue(new Error('API fail'));
     const report: SyncReport = await syncVinnovaGrants();
     expect(report.failed).toBe(report.total);
     expect(report.errors[0].error).toMatch(/API fail/);
   });
 
   it('is idempotent (unchanged grants are not updated)', async () => {
-    MockedVinnovaService.prototype.getCalls = jest.fn().mockResolvedValue([{ id: '1', title: 'A' }]);
+    MockedVinnovaService.prototype.getUtlysningar = jest.fn().mockResolvedValue([{ id: '1', title: 'A' }]);
     supabase._mock.single.mockResolvedValueOnce({ data: { id: '1', title: 'A', description: null, deadline: null, sector: null, stage: null }, error: null });
     const report: SyncReport = await syncVinnovaGrants();
     expect(report.unchanged).toBe(1);
@@ -104,7 +117,7 @@ describe('syncVinnovaGrants', () => {
   });
 
   it('handles malformed grants and missing fields', async () => {
-    MockedVinnovaService.prototype.getCalls = jest.fn().mockResolvedValue([{ foo: 'bar' }, null, { id: '2' }]);
+    MockedVinnovaService.prototype.getUtlysningar = jest.fn().mockResolvedValue([{ foo: 'bar' }, null, { id: '2' }]);
     supabase._mock.single.mockResolvedValueOnce({ data: null, error: { code: 'PGRST116' } });
     supabase._mock.upsert.mockResolvedValueOnce({ data: {}, error: null });
     const report: SyncReport = await syncVinnovaGrants();

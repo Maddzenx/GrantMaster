@@ -34,3 +34,29 @@
 5. Verify grant cards display all required information
 6. Test performance with large numbers of grants
 7. Verify 'View' button navigation works correctly
+
+# Subtasks:
+## 1. Dashboard Layout and Component Architecture [in-progress]
+### Dependencies: None
+### Description: Design and implement the core layout and component structure for the Grant Discovery Dashboard
+### Details:
+Create the main dashboard layout with header, filter sidebar, and grant list area. Implement the grant card component with title, description, funding amount, deadline, and tags. Define component props and state management. Ensure component reusability through proper abstraction. Performance optimization: implement virtualized list for grant cards to handle large datasets efficiently. UI/UX requirements: maintain consistent spacing, typography, and color scheme according to design system.
+
+## 2. Filter Panel and Search Functionality [pending]
+### Dependencies: 4.1
+### Description: Implement comprehensive filtering and search capabilities for grants discovery
+### Details:
+Build filter panel with category, funding amount range, deadline, and status filters. Implement multi-select filter options with clear/reset functionality. Create search bar with typeahead suggestions and keyword highlighting. Performance optimization: debounce search input and implement memoization for filter combinations. UI/UX requirements: provide visual feedback for active filters, implement animations for filter panel expansion/collapse, ensure keyboard accessibility for all filter controls.
+
+## 3. Data Fetching and State Management [pending]
+### Dependencies: 4.1, 4.2
+### Description: Implement data fetching logic and state management for grants data
+### Details:
+Create useGrants custom hook for fetching and managing grants data. Implement pagination with configurable page size. Add sorting functionality by relevance, deadline, and funding amount. Handle loading, error, and empty states. Performance optimization: implement request caching, add infinite scrolling with data windowing, and optimize re-renders with useMemo and useCallback. Ensure proper error handling and retry mechanisms for failed API requests.
+
+## 4. Responsive Design and Final Optimizations [pending]
+### Dependencies: 4.1, 4.2, 4.3
+### Description: Ensure responsive behavior across all device sizes and implement final performance optimizations
+### Details:
+Implement responsive layouts using CSS Grid/Flexbox with breakpoints for mobile, tablet, and desktop. Create collapsible filter panel for mobile view. Optimize images with lazy loading and proper sizing. Implement skeleton screens for loading states. Performance optimization: add code splitting for dashboard components, optimize bundle size, implement service worker for offline capability. Conduct cross-browser testing and accessibility audit (WCAG 2.1 AA compliance).
+

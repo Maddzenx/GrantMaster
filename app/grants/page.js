@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { supabase } from "../lib/supabaseClient";
 
 export default function GrantsDashboard() {
   const [grants, setGrants] = useState([]);

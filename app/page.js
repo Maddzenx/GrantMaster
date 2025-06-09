@@ -1,4 +1,5 @@
 import SupabaseTest from './components/SupabaseTest';
+import LogoutButton from '../components/LogOutButton';
 
 export default function Home() {
   return (
@@ -9,6 +10,7 @@ export default function Home() {
         Tailwind Button
       </button>
       <SupabaseTest />
+      <LogoutButton />
     </div>
   );
 }

@@ -1,10 +1,7 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState, ReactNode, useRef } from 'react';
-import { supabase } from '../supabase';
+import { supabase } from '../../../lib/supabaseClient';
 import type { Session, User } from '@supabase/supabase-js';
-import { act } from '@testing-library/react';
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
 
 interface AuthContextType {
   user: User | null;
@@ -28,6 +25,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [showLogoutWarning, setShowLogoutWarning] = useState(false);
   const logoutTimeout = useRef<NodeJS.Timeout | null>(null);
   const warningTimeout = useRef<NodeJS.Timeout | null>(null);
+  const initialSessionChecked = useRef(false);
 
   // Helper to set auto-logout timer and warning
   const setAutoLogout = (expiresAt: number | undefined) => {
@@ -54,24 +52,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const dismissLogoutWarning = () => setShowLogoutWarning(false);
 
   useEffect(() => {
-    // Listen for auth state changes (including token refresh)
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+    console.log('AuthContext useEffect running');
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      setLoading(false);
+      setSession(session);
       setAutoLogout(session?.expires_at);
+      initialSessionChecked.current = true;
+      setLoading(false);
+      console.log('AuthContext getSession: user =', session?.user);
+      console.log('AuthContext getSession: setLoading(false) called');
     });
 
-    // On mount, get the current session
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      setLoading(false);
-      setAutoLogout(data.session?.expires_at);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setSession(session);
+      setAutoLogout(session?.expires_at);
+      console.log('AuthContext onAuthStateChange: user =', session?.user);
+      // Only set loading to false if initial session check is done
+      if (initialSessionChecked.current) {
+        setLoading(false);
+        console.log('AuthContext onAuthStateChange: setLoading(false) called');
+      }
     });
 
     return () => {
-      listener?.subscription.unsubscribe();
+      subscription.unsubscribe();
       if (logoutTimeout.current) clearTimeout(logoutTimeout.current);
       if (warningTimeout.current) clearTimeout(warningTimeout.current);
     };

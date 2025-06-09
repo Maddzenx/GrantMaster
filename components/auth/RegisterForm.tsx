@@ -3,14 +3,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../app/lib/auth/AuthContext';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@supabase/supabase-js';
 import LogOutEverywhereButton from '@/components/auth/LogOutEverywhereButton';
-
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  // No need to specify storage; defaults to localStorage
-);
+import { supabase } from '../../lib/supabaseClient';
 
 let logoutTimeout: NodeJS.Timeout | null = null;
 

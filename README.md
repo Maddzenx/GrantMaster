@@ -79,3 +79,42 @@ grantmaster/
 ## License
 
 MIT 
+
+## Vinnova API Client
+
+A robust, type-safe client for the Vinnova Open Data and GDP APIs.
+
+### Features
+- Axios-based client with keep-alive, API key and OAuth2 support
+- Automatic retries, error handling, and in-memory caching
+- Typed endpoint wrappers for utlysningar, ansokningar, finansierade aktiviteter
+- Pagination helpers and robust error classes
+
+### Environment Variables
+- `VINNOVA_API_KEY`
+- `VINNOVA_API_BASE_URL`
+- `USE_OAUTH2`
+- `VINNOVA_TENANT_ID`, `VINNOVA_CLIENT_ID`, `VINNOVA_CLIENT_SECRET`, `VINNOVA_SCOPE` (for OAuth2)
+
+### Usage
+```typescript
+import { getUtlysningar } from './services/vinnovaApiClient';
+
+try {
+  const data = await getUtlysningar({ limit: 5 });
+  console.log(data.results);
+} catch (err) {
+  // See error handling example below
+}
+```
+
+### Error Handling
+- Throws `VinnovaAuthError` for 401/403
+- Throws `VinnovaRateLimitError` for 429
+- Throws `VinnovaServerError` for 5xx
+- Throws generic `Error` for network/unknown errors
+- Use `instanceof` to distinguish error types
+
+### Caching
+- GET requests are cached in-memory per-URL for 2 minutes by default
+- UseCache param can be set to false to bypass cache 

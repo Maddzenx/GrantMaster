@@ -1,12 +1,5 @@
-'use client';
-
-import React from 'react';
-import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import DashboardLayout from './components/DashboardLayout';
 
 export default function DashboardPage() {
-  return (
-    <ProtectedRoute>
-      <div>Dashboard content here</div>
-    </ProtectedRoute>
-  );
+  return <DashboardLayout />;
 }

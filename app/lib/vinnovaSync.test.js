@@ -8,13 +8,10 @@ jest.mock('./vinnovaClient', () => ({
 function createSupabaseMock() {
   const single = jest.fn();
   const upsert = jest.fn();
-  const chain = {
-    select: jest.fn(() => chain),
-    eq: jest.fn(() => chain),
+  return {
     single,
     upsert,
   };
-  return { chain, single, upsert };
 }
 
 const { fetchVinnovaGrants } = require('./vinnovaClient');
@@ -30,7 +27,6 @@ beforeEach(() => {
   jest.clearAllMocks();
   const mock = createSupabaseMock();
   supabase = require('./supabase').supabase;
-  supabase.from.mockImplementation(() => mock.chain);
   supabase._mock = mock; // for access in tests
 });
 
